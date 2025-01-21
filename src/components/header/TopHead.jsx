@@ -12,14 +12,14 @@ const TopHead = () => {
                 "Welcome to Amana Big Bazar Super Store Ltd. Committed to Quality & Service"}
             </p>
         </div>
-        <div className="header-top-contacts hidden sm:flex items-center gap-15 justify-center lg:justify-end min-w-[470px]">
+        <div className="header-top-contacts hidden sm:flex items-center gap-5 justify-center lg:justify-end min-w-[470px]">
         <div className="contact-numbers flex justify-center mt-1">
-           <i className="bx bxs-phone-call mr-1 relative"></i>
+           <i className="bx bxs-phone-call mr-1.5 relative mt-1"></i>
             <span>+8809612612000</span>
         </div>
         <div className="flex items-center contact-email justify-center">
           <span>
-            <i className="fas fa-envelope mr-2"></i>
+            <i className="fas fa-envelope mr-1.5 mt-2"></i>
           </span>
           <span>queries@amanagroupbd.com</span>
         </div>
