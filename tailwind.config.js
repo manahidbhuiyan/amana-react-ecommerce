@@ -9,6 +9,7 @@ export default {
         'lato': ['Lato', 'sans-serif'],
         'ibm-plex': ['IBM Plex Sans', 'sans-serif'],
         'montserrat': ['Montserrat', 'sans-serif'],
+        'times': ['"Times New Roman"', 'serif'],
       },
       colors: {
         themeColor: "#41b883",
