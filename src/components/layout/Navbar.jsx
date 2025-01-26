@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import logo from '../../assets/images/logo-beta.png';
-import profile_image from '../../assets/images/profile-img.png';
+import React, { useState } from "react";
+import logo from "../../assets/images/logo-beta.png";
+import profile_image from "../../assets/images/profile-img.png";
 
 const Navbar = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(true); // This state controls whether the user is logged in
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // This state controls whether the user is logged in
   const [dropdownOpen, setDropdownOpen] = useState(false);
-    
-    const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+  const [isClicked, setIsClicked] = useState(false);
+
+  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
   return (
     <div>
@@ -18,48 +19,68 @@ const Navbar = () => {
             <div className="header-bottom-col logo flex justify-start w-[100px] 2md:logo-[185px] lg:w-[200px] ">
               <div className="logo-inner w-[85px] ml-0 2md:mx-auto 2md:w-[130px]">
                 <a href="/">
-                  <img
-                    src={logo}
-                    alt="Amana Big Bazar"
-                    className="img-fluid"
-                  />
+                  <img src={logo} alt="Amana Big Bazar" className="img-fluid" />
                 </a>
               </div>
             </div>
             {/* Special Product Show for Large Devices */}
             <div className="special-product-button h-[40px] flex justify-between p-0 border-[3px] border-[#41b883] rounded-[14px] cursor-pointer ml-[5px] align-middle items-center font-times shadow-[0px_0px_5px_0px_#41b883]">
-                <button className="offer-btn bg-[#41b883] font-bold border-0 py-[8px] px-[10px] rounded-[10px] text-white text-font-14 tracking-[1px]">OFFERS</button>
-                <p className="offer-text px-[6px] text-[20px] font-bold text-[#41b883] leading-[1.3] self-center">99+</p>
+              <button className="offer-btn bg-[#41b883] font-bold border-0 py-[8px] px-[10px] rounded-[10px] text-white text-font-14 tracking-[1px]">
+                OFFERS
+              </button>
+              <p className="offer-text px-[6px] text-[20px] font-bold text-[#41b883] leading-[1.3] self-center">99+</p>
             </div>
-
           </div>
 
-          {/* Search Form for Large Devices */}
-          <div className="header-bottom-col search-wrap flex-grow flex-shrink basis-auto hidden lg:block">
-            <div className="header-bottom-mid bg-white rounded shadow-sm py-1">
+          {/* Search for Large Devices */}
+          <div className="header-bottom-col search-wrap flex-grow flex-shrink basis-auto hidden lg:block font-proxima">
+            <div className="header-bottom-mid bg-white rounded shadow-sm">
               <form className="flex">
-              <div className="form-group mb-0 relative mr-2 mr-lg-3">
-                <select className="form-control border-none text-sm cursor-pointer focus:outline-none focus:ring-0">
-                    <option disabled>All Categories</option>
-                    <option>Category 1</option>
-                    <option>Category 2</option>
-                    {/* Add categories here */}
-                </select>
-                <div className="absolute right-[-17px] top-1/2 transform -translate-y-1/2 bg-[#212529] w-[2px] h-[15px] z-10 hidden lg:block"></div>
+                <div className="form-group w-1/4 mb-0 relative mr-2 mr-lg-3">
+                  <select
+                    className="w-full rounded-md py-2 px-4 text-[14px] text-[#495057] cursor-pointer appearance-none bg-white bg-no-repeat bg-right bg-[length:10px_10px] focus:outline-none"
+                    onClick={() => setIsClicked(true)}
+                    onChange={(e) => console.log(`Selected: ${e.target.value}`)}
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='10' height='12' viewBox='0 0 10 12'%3e%3cpath fill='%23343a40' d='M5 0L0 5h10L5 0zM5 12L0 7h10L5 12z'/%3e%3c/svg%3e")`,
+                      backgroundPosition: "calc(100% - 10px) center",
+                    }}
+                  >
+                    <option value="all" disabled={isClicked} className="cursor-pointer text-[#6c757d]">
+                      All Categories
+                    </option>
+                    <option value="fruits" className="cursor-pointer">
+                      Fruits
+                    </option>
+                    <option value="grocery" className="cursor-pointer">
+                      Grocery
+                    </option>
+                    <option value="vegetables" className="cursor-pointer">
+                      Vegetables
+                    </option>
+                    <option value="snacks" className="cursor-pointer">
+                      Snacks
+                    </option>
+                    <option value="beverages" className="cursor-pointer">
+                      Beverages
+                    </option>
+                    <option value="meat" className="cursor-pointer">
+                      Meat
+                    </option>
+                  </select>
+
+                  <div className="absolute right-[-17px] top-1/2 transform -translate-y-1/2 bg-[#212529] w-[2px] h-[15px] z-10 hidden lg:block"></div>
                 </div>
-                <div className="form-group mb-0 flex-fill ml-3">
-                  <div className="input-group cus-input-field">
+                <div className="form-group w-3/4 mb-0 flex-fill ml-3">
+                  <div className="input-group w-full relative p-1">
                     <input
                       type="text"
-                      className="form-control border-0"
+                      className="form-control w-3/4 lg:w-4/5 border-0 px-2 placeholder:text-font-14 placeholder:text-[#495057] focus-visible:outline-0"
                       placeholder="Search for products..."
                     />
-                    <div className="input-group-append">
-                      <button
-                        type="button"
-                        className="input-group-text"
-                      >
-                        <i className="fas fa-search mr-2" style={{ color: '#41b883' }}></i>
+                    <div className="absolute right-2 top-1.5">
+                      <button type="button" className="input-group-text text-font-14 text-[#495057]">
+                        <i className="fas fa-search mr-2" style={{ color: "#41b883" }}></i>
                         Search
                       </button>
                     </div>
@@ -72,68 +93,77 @@ const Navbar = () => {
           {/* Header Right */}
           <div className="header-right flex items-center text-right justify-between gap-3 header-bottom-col ml-2 ml-lg-4">
             <button className="mr-2 text-capitalize small-device-branch branch-change ">
-              <span className="text">
-                <i className="fas fa-map-marker-alt mr-2" style={{ color: '#41b883' }}></i>
+              <span className="text text-textColor">
+                <i className="fas fa-map-marker-alt mr-2" style={{ color: "#41b883" }}></i>
                 Branch Name
               </span>
             </button>
 
-    <div className="profile-button min-w-[35px] 2md:min-w[65px]">
-      {/* Profile Button - Conditional Rendering */}
-      <div className="signin-dropdown">
-      <div className="dropdown relative">
-      <button 
-        className="profile-dropdown-btn flex items-center" 
-        onClick={toggleDropdown}
-      >
-        {/* Show icon and text if not logged in */}
-        {!isLoggedIn ? (
-          <>
-            <i className="fas fa-user mr-2"></i> Sign In
-          </>
-        ) : (
-          <div className="pro-pic w-[35px] h-[35px] rounded-full bg-white text-center leading-[35px] shadow-[0_0_10px_2px_rgba(0,0,0,.08)]">
-            {/* Show profile picture if logged in */}
-            <img
-              src={profile_image} // Replace with actual image URL
-              alt="profile-pic"
-              className="img-fluid rounded-full"
-            />
-          </div>
-        )}
-      </button>
+            <div className="profile-button min-w-[35px] 2md:min-w[65px]">
+              {/* Profile Button - Conditional Rendering */}
+              <div className="signin-dropdown">
+                <div className="dropdown relative">
+                  <button className="profile-dropdown-btn flex items-center" onClick={toggleDropdown}>
+                    {/* Show icon and text if not logged in */}
+                    {!isLoggedIn ? (
+                      <>
+                        <i className="fas fa-user mr-2"></i> Sign In
+                      </>
+                    ) : (
+                      <div className="pro-pic w-[35px] h-[35px] rounded-full bg-white text-center leading-[35px] shadow-[0_0_10px_2px_rgba(0,0,0,.08)]">
+                        {/* Show profile picture if logged in */}
+                        <img src={profile_image} alt="profile-pic" className="img-fluid rounded-full" />
+                      </div>
+                    )}
+                  </button>
 
-      {/* Dropdown Menu */}
-      {dropdownOpen && isLoggedIn && (
-        <div className="dropdown-menu absolute right-0 mt-2 w-[200px] bg-white border border-gray-300 rounded shadow-lg z-10">
-          <a href="#" className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] "><i className="text-font-14 hover:text-themeColor fas fa-user mr-1"></i> My Profile</a>
-          <a href="#" className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] "><i className="text-font-14 hover:text-themeColor fas fa-box mr-1"></i> My Orders</a>
-          <a href="#" className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] "><i className="text-font-14 hover:text-themeColor fas fa-lock mr-1"></i> Change Password</a>
-          <a href="#" className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] "><i className="text-font-14 hover:text-themeColor fas fa-user-times mr-1"></i> Delete Account</a>
-          {/* <div className="dropdown-divider my-2"></div> */}
-          <a 
-            href="#" 
-            className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] border-t border-t-[#e9ecef]" 
-            onClick={() => setIsLoggedIn(false)}
-          >
-           <i className="text-font-14 hover:text-themeColor fas fa-sign-out-alt mr-1"></i> Sign Out
-          </a>
-        </div>
-      )}
-    </div>
-      </div>
-    </div>
-
+                  {/* Dropdown Menu */}
+                  {dropdownOpen && isLoggedIn && (
+                    <div className="dropdown-menu absolute right-0 mt-2 w-[200px] bg-white border border-gray-300 rounded shadow-lg z-10">
+                      <a
+                        href="#"
+                        className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] "
+                      >
+                        <i className="text-font-14 hover:text-themeColor fas fa-user mr-1"></i> My Profile
+                      </a>
+                      <a
+                        href="#"
+                        className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] "
+                      >
+                        <i className="text-font-14 hover:text-themeColor fas fa-box mr-1"></i> My Orders
+                      </a>
+                      <a
+                        href="#"
+                        className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] "
+                      >
+                        <i className="text-font-14 hover:text-themeColor fas fa-lock mr-1"></i> Change Password
+                      </a>
+                      <a
+                        href="#"
+                        className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] "
+                      >
+                        <i className="text-font-14 hover:text-themeColor fas fa-user-times mr-1"></i> Delete Account
+                      </a>
+                      {/* <div className="dropdown-divider my-2"></div> */}
+                      <a
+                        href="#"
+                        className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] border-t border-t-[#e9ecef]"
+                        onClick={() => setIsLoggedIn(false)}
+                      >
+                        <i className="text-font-14 hover:text-themeColor fas fa-sign-out-alt mr-1"></i> Sign Out
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Smaller to Mid Devices Search */}
       <div className="header-sm flex items-center mt-1 mb-0 mx-3 lg:hidden">
-        <button
-          type="button"
-          className="btn btn-default btn-category-all d-sm-none mr-3"
-        >
+        <button type="button" className="btn btn-default btn-category-all d-sm-none mr-3">
           <i className="fas fa-list"></i>
         </button>
         <div className="header-bottom-mid bg-white rounded shadow-sm px-2 flex-fill">
@@ -148,16 +178,9 @@ const Navbar = () => {
             </div>
             <div className="form-group mb-0 flex-fill ml-0 ml-sm-3">
               <div className="input-group cus-input-field">
-                <input
-                  type="text"
-                  className="form-control border-0"
-                  placeholder="Search for products..."
-                />
+                <input type="text" className="form-control border-0" placeholder="Search for products..." />
                 <div className="input-group-append">
-                  <button
-                    type="button"
-                    className="input-group-text"
-                  >
+                  <button type="button" className="input-group-text">
                     <i className="fas fa-search mr-2 text-success"></i> Search
                   </button>
                 </div>
@@ -177,9 +200,7 @@ const Navbar = () => {
             All Categories <i className="fas fa-list"></i>
           </button>
         </div>
-        <div className="offers pl-4 hidden sm:flex">
-          {/* Add offers here */}
-        </div>
+        <div className="offers pl-4 hidden sm:flex">{/* Add offers here */}</div>
       </div>
     </div>
   );
