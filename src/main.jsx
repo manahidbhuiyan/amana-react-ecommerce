@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux"; // Redux Provider import
-import { store } from "./redux/store"; // Redux Store import
+import { store } from "./app/store.js"; // Redux Store import
 
 import "@fortawesome/fontawesome-free/css/all.min.css"; // Font Awesome
 import "boxicons/css/boxicons.min.css"; // Boxicons
