@@ -20,6 +20,7 @@ export default {
         darkgrey: "#aaa",
         textColor: "#212529",
         textColorLight: "#444",
+        buttonColor: '#22C55E',
       },
       animation: {
         marquee: "marquee 15s linear infinite",

@@ -13,11 +13,13 @@ const Location = () => {
     dispatch(fetchBranches());
   }, [dispatch]);
 
-  console.log("branches", branches);
+  const handleLocation = (childValue) =>{
+    setIsOpen(childValue)
+  }
 
   return (
     <div>
-      <div onClick={() => setIsOpen(true)}>
+      <div onClick={() => setIsOpen(true)} className="cursor-pointer ">
       {isLoading && <p>Loading...</p>}
       {isError && <p>Error fetching locations</p>}
       {branches.length > 0 ? (
@@ -30,11 +32,11 @@ const Location = () => {
           </button>
         ))
       ) : (
-        <p>No area found</p>
+        <p>No area Select</p>
       )}
     </div>
     <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="fixed w-full min-h-screen inset-0 z-50 items-center">
-      <LocationDetails />
+      <LocationDetails sendDataToParent={handleLocation} />
     </Dialog>
     </div>
   );

@@ -42,17 +42,18 @@ const bdLocations = [
   },
 ];
 
-const LocationDetails = () => {
+const LocationDetails = ({ sendDataToParent }) => {
   const [selectedDivision, setSelectedDivision] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedArea, setSelectedArea] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
 
   const selectedDiv = bdLocations.find((div) => div.division === selectedDivision);
   const selectedDist = selectedDiv?.districts.find((dist) => dist.name === selectedDistrict);
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-lg w-96 ">
-      <h2 className="text-xl font-bold mb-4">Select Your Location</h2>
+    <div className="bg-white rounded-lg p-6 shadow-2xl w-96 mx-auto mt-[30vh]">
+      <h2 className="text-xl font-bold mb-4">Select Your Area</h2>
       <div className="space-y-3">
         {/* Division Dropdown */}
         <select
@@ -102,8 +103,23 @@ const LocationDetails = () => {
       </div>
 
       {/* Close Button */}
-      <div className="mt-4 flex justify-end">
-        <button onClick={() => setIsOpen(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
+      <div className="mt-4 flex justify-end space-x-4">
+        <button
+          onClick={() => {
+            setIsOpen(false);
+            sendDataToParent(isOpen);
+          }}
+          className="px-4 py-2 bg-buttonColor text-white rounded-lg"
+        >
+          Save
+        </button>
+        <button
+          onClick={() => {
+            setIsOpen(false);
+            sendDataToParent(isOpen);
+          }}
+          className="px-4 py-2 bg-buttonColor text-white rounded-lg"
+        >
           Close
         </button>
       </div>
