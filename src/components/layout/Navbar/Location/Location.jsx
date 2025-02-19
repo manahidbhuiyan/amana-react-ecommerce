@@ -7,7 +7,7 @@ import LocationDetails from "./LocationDetails";
 const Location = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
-  const { branches, isLoading, isError } = useSelector((state) => state.location); // ✅ FIXED
+  const { branches, isLoading, isError } = useSelector((state) => state.location); 
 
   useEffect(() => {
     dispatch(fetchBranches());
@@ -16,6 +16,9 @@ const Location = () => {
   const handleLocation = (childValue) =>{
     setIsOpen(childValue)
   }
+
+  const { selectedArea } = useSelector((state) => state.location)
+  console.log("selectedArea",selectedArea)
 
   return (
     <div>
@@ -32,11 +35,11 @@ const Location = () => {
           </button>
         ))
       ) : (
-        <p>No area Select</p>
+        <p>{selectedArea ? selectedArea : "No area selected"}</p>
       )}
     </div>
     <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="fixed w-full min-h-screen inset-0 z-50 items-center">
-      <LocationDetails sendDataToParent={handleLocation} />
+      <LocationDetails sendDataToParent={handleLocation} branches={branches.data} />
     </Dialog>
     </div>
   );

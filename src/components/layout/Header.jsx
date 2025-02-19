@@ -1,5 +1,5 @@
 import React from 'react'
-import TopHead from '../header/TopHead'
+import TopHead from './header/TopHead'
 import Navbar from './Navbar'
 
 const Header = () => {
