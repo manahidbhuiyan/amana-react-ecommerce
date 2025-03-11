@@ -1,28 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect  } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedArea, setBranchId } from "../../../../features/locations/locationSlice";
 
-const LocationDetails = ({sendDataToParent, branches}) => {
+const LocationDetails = ({ sendDataToParent, branches }) => {
   const dispatch = useDispatch();
-  const {selectedArea, branchId} = useSelector((state) => state.location)
+  const { selectedArea, branchId } = useSelector((state) => state.location);
 
-  // states
-  const [selectedDistrict, setSelectedDistrict] = useState("") ;
-  const [filterAreas, setFilteredAreas] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
+  // States
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [filteredAreas, setFilteredAreas] = useState([]);
 
-  // Extract unique districts & sort them
+   const [isOpen, setIsOpen] = useState(false);
+
+// Extract unique districts & sort them
 const uniqueDistricts = [...new Set(branches.map(branch => branch.district.name))].sort((a, b) => a.localeCompare(b));
 
+// Filter area Based on selected district
+
 useEffect(() => {
-  if(selectedDistrict) {
-    const areas = branches.filter(branch => branch.district.name === selectedDistrict)
-                          .flatMap(branch => branch.areas)
-                          .sort((a, b) => a.name.localeCompare(b.name))
-         
-      setFilteredAreas(areas);
-  }else{
+  if (selectedDistrict) {
+    const areas = branches
+      .filter(branch => branch.district.name === selectedDistrict)
+      .flatMap(branch => branch.areas) 
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    setFilteredAreas(areas);
+  } else {
     setFilteredAreas([]);
   }
 }, [selectedDistrict, branches]);
@@ -34,11 +38,11 @@ const handleAreaSelect = (area, branchId) => {
 };
 
 
-
   return (
     <div className="bg-white rounded-lg p-6 shadow-2xl w-96 mx-auto mt-[30vh]">
       <h2 className="text-xl font-bold mb-4">Select Your Area</h2>
       <div className="space-y-3">
+
         {/* District Dropdown */}
         <select
           value={selectedDistrict}
@@ -56,19 +60,20 @@ const handleAreaSelect = (area, branchId) => {
           ))}
         </select>
 
+
         {/* Area Dropdown */}
         <select
           value={selectedArea}
           onChange={(e) => {
             const selectedArea = e.target.value;
-            const branchId = branches.find((branch) => branch.areas.some((area) => area.name === selectedArea))?._id;
+            const branchId = branches.find(branch => branch.areas.some(area => area.name === selectedArea))?._id;
             handleAreaSelect(selectedArea, branchId);
           }}
           className="w-full p-2 border rounded-lg"
           disabled={!selectedDistrict}
         >
           <option value="">Select Area</option>
-          {filterAreas.map((area, idx) => (
+          {filteredAreas.map((area, idx) => (
             <option key={idx} value={area.name}>
               {area.name}
             </option>
