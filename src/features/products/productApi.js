@@ -9,9 +9,9 @@ export const getProducts = async (pageNo, branchID, queryString) => {
 
         let requestLink = '/api/product/lists/' + pageNo + '?branch=' + branchID + searchQuery;
         const res = await axios.get(requestLink);
-        return res.data; // Directly returning data instead of response object
+        return res.data;
     } catch (error) {
         console.error("Error fetching products:", error);
-        throw error; // Ensure errors are properly thrown
+        throw error;
     }
 };

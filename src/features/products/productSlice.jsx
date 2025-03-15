@@ -3,6 +3,7 @@ import { getProducts } from './productApi'
 
 const initialState = {
     newProducts: [],  // ✅ Make sure this exists
+    specialProducts: [],
     isLoading: false,
     isError: false,
     branchId: null,
@@ -11,6 +12,8 @@ const initialState = {
 
 export const loadProductData = createAsyncThunk("products/loadProductData",
     async ({ pageNo, branchId, queryString }) => {
+        console.log("pageNo",pageNo)
+        console.log("branchId",branchId)
         const products = await getProducts(pageNo, branchId, queryString);
         return products; // Returning data directly
     }
