@@ -8,6 +8,7 @@ export const getProducts = async (pageNo, branchID, queryString) => {
         }
 
         let requestLink = '/api/product/lists/' + pageNo + '?branch=' + branchID + searchQuery;
+        console.log("requestLink",requestLink)
         const res = await axios.get(requestLink);
         return res.data;
     } catch (error) {

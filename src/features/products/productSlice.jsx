@@ -2,20 +2,23 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getProducts } from './productApi'
 
 const initialState = {
-    newProducts: [],  // ✅ Make sure this exists
-    specialProducts: [],
+    newProducts: [],
+    specialOffers: [],
     isLoading: false,
     isError: false,
     branchId: null,
     error: "",
 }
 
+// Modified to include queryType to differentiate between new products and special offers
 export const loadProductData = createAsyncThunk("products/loadProductData",
-    async ({ pageNo, branchId, queryString }) => {
-        console.log("pageNo",pageNo)
-        console.log("branchId",branchId)
+    async ({ pageNo, branchId, queryString, queryType }) => {
+        console.log("pageNo", pageNo)
+        console.log("branchId", branchId)
+        console.log("queryString", queryString)
+        console.log("queryType", queryType)
         const products = await getProducts(pageNo, branchId, queryString);
-        return products; // Returning data directly
+        return { products, queryType }; // Return both the products and the query type
     }
 );
 
@@ -25,6 +28,9 @@ const productSlice = createSlice({
     reducers: {
         setNewProducts(state, action) {
             state.newProducts = action.payload;
+        },
+        setSpecialOffers(state, action){
+            state.specialOffers = action.payload
         }
     },
     extraReducers: (builder) => {
@@ -35,16 +41,21 @@ const productSlice = createSlice({
             })
             .addCase(loadProductData.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.newProducts = action.payload; // Fixed state update
+                
+                // Check the query type and update the appropriate state
+                if (action.payload.queryType === 'newProduct') {
+                    state.newProducts = action.payload.products;
+                } else if (action.payload.queryType === 'specialOffer') {
+                    state.specialOffers = action.payload.products;
+                }
             })
             .addCase(loadProductData.rejected, (state, action) => {
                 state.isLoading = false;
                 state.isError = true;
-                state.newProducts = [];
                 state.error = action.error?.message;
             });
     },
 });
 
-export const { setNewProducts } = productSlice.actions;
+export const { setNewProducts, setSpecialOffers } = productSlice.actions;
 export default productSlice.reducer;
