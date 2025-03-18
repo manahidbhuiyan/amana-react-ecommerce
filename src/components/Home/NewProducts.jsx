@@ -27,12 +27,10 @@ const NewProducts = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    console.log("New Products:", newProducts);
     if (newProducts && newProducts.count > 0 ){
       setSlides(newProducts)
       setLoading(false)
     }
-    console.log("is loading",loading)
   }, [newProducts]);
 
   if (loading) {
@@ -80,7 +78,7 @@ const NewProducts = () => {
             480: { slidesPerView: 2, spaceBetween: 10 },
             640: { slidesPerView: 3, spaceBetween: 15 },
             768: { slidesPerView: 5, spaceBetween: 15 },
-            1024: { slidesPerView: 7, spaceBetween: 20 }
+            1024: { slidesPerView: 6, spaceBetween: 20 }
           }}
           className="mySwiper"
         >

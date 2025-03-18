@@ -15,7 +15,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/product/:id" element={<Product />} />
-        <Route path="/login" element={<SignIn />} />
+        <Route path="/signin" element={<SignIn />} />
       </Routes>
       <Footer /> {/* Optional: Footer will appear in all pages */}
     </Router>

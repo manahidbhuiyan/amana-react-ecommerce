@@ -13,10 +13,6 @@ const initialState = {
 // Modified to include queryType to differentiate between new products and special offers
 export const loadProductData = createAsyncThunk("products/loadProductData",
     async ({ pageNo, branchId, queryString, queryType }) => {
-        console.log("pageNo", pageNo)
-        console.log("branchId", branchId)
-        console.log("queryString", queryString)
-        console.log("queryType", queryType)
         const products = await getProducts(pageNo, branchId, queryString);
         return { products, queryType }; // Return both the products and the query type
     }

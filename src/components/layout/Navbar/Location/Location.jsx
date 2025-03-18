@@ -1,23 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchBranches } from "../../../../features/locations/locationSlice";
+import { fetchBranches, setSelectedArea, setBranchId } from "../../../../features/locations/locationSlice";
 import { Dialog } from "@headlessui/react";
 import LocationDetails from "./LocationDetails";
 
 const Location = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
-  const { branches, isLoading, isError } = useSelector((state) => state.location);
+  const { branches, isLoading, isError, selectedArea, branchId } = useSelector((state) => state.location);
 
   useEffect(() => {
     dispatch(fetchBranches());
-  }, [dispatch]);
+
+    if(!selectedArea){
+      const storedArea = localStorage.getItem("selectedArea")
+      const storedBranchId = localStorage.getItem("branchId")
+
+      if(storedArea && storedBranchId ){
+        dispatch(setSelectedArea(storedArea))
+        dispatch(setBranchId(storedBranchId))
+      }
+    }
+
+  }, [dispatch, selectedArea]);
 
   const handleLocation = (childValue) => {
     setIsOpen(childValue);
   };
 
-  const { selectedArea } = useSelector((state) => state.location);
 
   return (
     <div>

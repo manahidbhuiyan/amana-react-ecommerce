@@ -37,7 +37,7 @@ const Navbar = () => {
           <SearchBar />
 
           {/* Header Right */}
-          <div className="header-right flex items-center text-right justify-between gap-3 header-bottom-col ml-2 ml-lg-4">
+          <div className="header-right flex items-center text-right justify-between gap-3 header-bottom-col">
             <Location></Location>
 
             <div className="profile-button min-w-[35px] 2md:min-w[65px]">
