@@ -7,33 +7,31 @@ import LocationDetails from "./LocationDetails";
 const Location = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
-  const { branches, isLoading, isError, selectedArea, branchId } = useSelector((state) => state.location);
+  const { branches, isLoading, isError, selectedArea } = useSelector((state) => state.location);
 
   useEffect(() => {
     dispatch(fetchBranches());
 
-    if(!selectedArea){
-      const storedArea = localStorage.getItem("selectedArea")
-      const storedBranchId = localStorage.getItem("branchId")
+    if (!selectedArea) {
+      const storedArea = localStorage.getItem("selectedArea");
+      const storedBranchId = localStorage.getItem("branchId");
 
-      if(storedArea && storedBranchId ){
-        dispatch(setSelectedArea(storedArea))
-        dispatch(setBranchId(storedBranchId))
+      if (storedArea && storedBranchId) {
+        dispatch(setSelectedArea(storedArea));
+        dispatch(setBranchId(storedBranchId));
       }
     }
-
   }, [dispatch, selectedArea]);
 
   const handleLocation = (childValue) => {
     setIsOpen(childValue);
   };
 
-
   return (
     <div>
       <div onClick={() => setIsOpen(true)} className="cursor-pointer ">
         {isLoading && <p>Loading...</p>}
-        {isError && <p className="pb-1" >Something wrong!</p>}
+        {isError && <p className="pb-1">Something wrong!</p>}
         {branches.length > 0 ? (
           branches.map((branch, index) => (
             <button key={index} className="mr-2 text-capitalize small-device-branch branch-change">
@@ -47,7 +45,13 @@ const Location = () => {
           <p>{selectedArea ? selectedArea : "No area select"}</p>
         )}
       </div>
-      <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="fixed w-full min-h-screen inset-0 z-50 items-center">
+      <Dialog
+        open={isOpen}
+        onClose={() => {
+          setIsOpen(false);
+        }}
+        className="fixed w-full min-h-screen inset-0 z-50 items-center"
+      >
         <LocationDetails sendDataToParent={handleLocation} branches={branches.data} />
       </Dialog>
     </div>
