@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchBranches, setSelectedArea, setBranchId } from "../../../../features/locations/locationSlice";
 import { Dialog } from "@headlessui/react";
 import LocationDetails from "./LocationDetails";
 
-const Location = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const Location = forwardRef((props, ref) =>{
+  
+  const [isOpen, setIsOpen] = useState(props.autoOpen || false);
   const dispatch = useDispatch();
   const { branches, isLoading, isError, selectedArea } = useSelector((state) => state.location);
 
   useEffect(() => {
+    console.log("branches",branches)
     dispatch(fetchBranches());
 
     if (!selectedArea) {
@@ -23,8 +25,14 @@ const Location = () => {
     }
   }, [dispatch, selectedArea]);
 
+    // Add this to expose the open method
+    useImperativeHandle(ref, () => ({
+      openDialog: () => setIsOpen(true)
+    }));
+
   const handleLocation = (childValue) => {
     setIsOpen(childValue);
+    console.log("clicked")
   };
 
   return (
@@ -56,6 +64,6 @@ const Location = () => {
       </Dialog>
     </div>
   );
-};
+})
 
 export default Location;

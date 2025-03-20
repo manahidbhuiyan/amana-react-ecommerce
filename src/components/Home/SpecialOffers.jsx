@@ -89,8 +89,8 @@ const SpecialOffers = () => {
                 <div className="card product-card bg-white shadow-lg rounded-lg overflow-hidden">
                   <div className="relative">
                     {product.discount > 0 && (
-                      <div className="absolute top-0 right-0 w-[70px] h-[70px] p-[15px] pt-[15px] bg-[url('../../assets/images/offer.png')] bg-no-repeat bg-cover bg-center text-white text-center text-[15px] font-bold z-5">
-                        {Number(product.discount.toFixed(2)) + " tk."} <br />
+                      <div className="absolute top-0 right-0 w-[120px] h-[40px] p-2.5 bg-red-300 bg-no-repeat bg-cover bg-center text-white text-center text-[15px] font-bold z-5">
+                        {Number(product.discount.toFixed(2)) + " tk. "} 
                         Off
                       </div>
                     )}

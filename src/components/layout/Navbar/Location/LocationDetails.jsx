@@ -110,6 +110,7 @@ const LocationDetails = ({ sendDataToParent, branches }) => {
           onClick={() => {
             branchSelect();
             sendDataToParent(false);
+            window.location.href = "/";
           }}
           className="px-4 py-2 bg-buttonColor text-white rounded-lg"
           disabled={!selectedArea}
@@ -118,6 +119,7 @@ const LocationDetails = ({ sendDataToParent, branches }) => {
         </button>
         <button
           onClick={() => {
+            window.location.href = "/";
             sendDataToParent(false);
           }}
           className="px-4 py-2 bg-buttonColor text-white rounded-lg"

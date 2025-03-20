@@ -1,12 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../../assets/images/logo-beta.png";
 import profile_image from "../../assets/images/profile-img.png";
 import SearchBar from './Navbar/SearchBar/SearchBar'
 import Location from './Navbar/Location/Location'
+import { useNavigate } from "react-router-dom"; 
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // This state controls whether the user is logged in
+  const navigate = useNavigate()
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // This state controls whether the user is logged in
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const {user, token} = useSelector(state => state.auth)
+  
+  useEffect(() => {
+    console.log("user",user)
+    console.log("token",token)
+  })
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
@@ -19,9 +29,7 @@ const Navbar = () => {
           <div className="header-left flex items-center">
             <div className="header-bottom-col logo flex justify-start w-[100px] 2md:logo-[185px] lg:w-[200px] ">
               <div className="logo-inner w-[85px] ml-0 2md:mx-auto 2md:w-[130px]">
-                <a href="/">
-                  <img src={logo} alt="Amana Big Bazar" className="img-fluid" />
-                </a>
+                  <img onClick={() => navigate('/', {replace: true})} src={logo} alt="Amana Big Bazar" className="img-fluid" />
               </div>
             </div>
             {/* Special Product Show for Large Devices */}
@@ -46,11 +54,32 @@ const Navbar = () => {
                 <div className="dropdown relative">
                   <button className="profile-dropdown-btn flex items-center" onClick={toggleDropdown}>
                     {/* Show icon and text if not logged in */}
-                    {!isLoggedIn ? (
+                    {!isLoggedIn ? 
+                    (
                       <>
-                        <i className="fas fa-user mr-2"></i> Sign In
+                        <button onClick={() => navigate('/signin', {replace: true}) } >
+                        <i className="fas fa-user mr-0.5"></i> Sign In
+                        </button>
+                        
                       </>
-                    ) : (
+                    ) 
+                    
+
+            //   <span
+            //   class="profile-button-inner-full"
+            //   v-if="user == null"
+            //   @click="signIn()"
+            //   ><router-link to="/signin" class="signin-link">
+            //     <span class="prflBtn-lrgDvc"
+            //       ><i class="fas fa-user" style="color: #41b883"></i> Sign
+            //       In</span
+            //     >
+            //     <span class="prflBtn-SmlDvc"
+            //       ><i class="fas fa-user" style="color: #41b883"></i
+            //     ></span> </router-link
+            // ></span>
+
+                    : (
                       <div className="pro-pic w-[35px] h-[35px] rounded-full bg-white text-center leading-[35px] shadow-[0_0_10px_2px_rgba(0,0,0,.08)]">
                         {/* Show profile picture if logged in */}
                         <img src={profile_image} alt="profile-pic" className="img-fluid rounded-full" />
