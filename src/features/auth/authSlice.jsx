@@ -1,14 +1,16 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { loginUserAuth } from "./authApi.js";
+import { loginUserAuth, getuserInfo } from "./authApi.js";
 
 const initialState = {
   user: null,
   token: localStorage.getItem("userToken") || null,
   isLoading: false,
   isError: false,
+  userInformation: null,
   error: "",
 };
 
+// user loggedIn
 export const signInUser = createAsyncThunk("auth/signInUser", async (credentials, { rejectWithValue }) => {
   try {
     const response = await loginUserAuth(credentials);
@@ -22,6 +24,12 @@ export const signInUser = createAsyncThunk("auth/signInUser", async (credentials
   }
 });
 
+// Load user
+export const loadUser = createAsyncThunk("auth/loadUser", async () => {
+  const user = await getuserInfo();
+  return user.data;
+});
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -32,6 +40,7 @@ const authSlice = createSlice({
     logOutUser(state) {
       state.user = null;
       state.token = null;
+      state.userInformation = null;
       localStorage.removeItem("userToken");
     },
   },
@@ -41,6 +50,7 @@ const authSlice = createSlice({
         state.isLoading = true;
         state.isError = false;
         state.error = "";
+        state.userInformation = null;
       })
       .addCase(signInUser.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -49,7 +59,6 @@ const authSlice = createSlice({
         // Store token in localStorage
         if (action.payload?.token) {
           localStorage.setItem("userToken", action.payload.token);
-          
         }
       })
       .addCase(signInUser.rejected, (state, action) => {
@@ -57,6 +66,45 @@ const authSlice = createSlice({
         state.isError = true;
         state.error = action.payload;
       });
+
+    builder
+      // Add these new cases for loadUser
+      .addCase(loadUser.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+        state.error = "";
+      })
+      .addCase(loadUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.userInformation = action.payload;
+      })
+      .addCase(loadUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.error = action.payload;
+      });
+
+    // builder
+    //   // Add these new cases for loadUser
+    //   .addCase(logOutUser.pending, (state) => {
+    //     state.isLoading = true;
+    //     state.isError = false;
+    //     state.error = "";
+    //   })
+    //   .addCase(logOutUser.fulfilled, (state, action) => {
+    //     state.isLoading = false;
+    //     state.user = null
+    //     state.token = null
+    //     state.userInformation = null
+    //     if (!action.payload?.token) {
+    //       localStorage.removeItem("userToken");
+    //     }
+    //   })
+    //   .addCase(logOutUser.rejected, (state, action) => {
+    //     state.isLoading = false;
+    //     state.isError = true;
+    //     state.error = action.payload;
+    //   });
   },
 });
 

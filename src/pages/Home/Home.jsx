@@ -11,7 +11,6 @@ const Home = () => {
   const localSelectArea = localStorage.getItem("selectedArea");
 
   useEffect(() => {
-    console.log("localSelectArea", localSelectArea);
     if (!localSelectArea) {
       toast.warning("You need to select an area first", {
         position: "top-center",

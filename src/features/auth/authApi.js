@@ -1,4 +1,5 @@
 import axios from '../../utilis/axios'
+import setAuthToken from '../../utilis/setAuthToken';
 
 export const loginUserAuth = async (credentials) => {
     try {
@@ -12,3 +13,20 @@ export const loginUserAuth = async (credentials) => {
         throw error; // Re-throw to handle in the thunk
     }
 }
+
+export const getuserInfo = async() =>{
+    try{
+        if (localStorage.userToken) {
+            setAuthToken(localStorage.userToken)
+          }
+        
+        const response = await axios.get("/api/user")
+        return response
+    }
+    catch(error){
+        console.log(error);
+        throw error;
+    }
+}
+
+

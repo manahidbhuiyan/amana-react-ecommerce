@@ -11,7 +11,6 @@ const Location = forwardRef((props, ref) =>{
   const { branches, isLoading, isError, selectedArea } = useSelector((state) => state.location);
 
   useEffect(() => {
-    console.log("branches",branches)
     dispatch(fetchBranches());
 
     if (!selectedArea) {
@@ -32,7 +31,6 @@ const Location = forwardRef((props, ref) =>{
 
   const handleLocation = (childValue) => {
     setIsOpen(childValue);
-    console.log("clicked")
   };
 
   return (

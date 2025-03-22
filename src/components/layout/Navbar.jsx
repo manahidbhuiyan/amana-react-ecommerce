@@ -1,24 +1,43 @@
 import React, { useEffect, useState } from "react";
 import logo from "../../assets/images/logo-beta.png";
-import profile_image from "../../assets/images/profile-img.png";
-import SearchBar from './Navbar/SearchBar/SearchBar'
-import Location from './Navbar/Location/Location'
-import { useNavigate } from "react-router-dom"; 
-import { useSelector } from "react-redux";
+import profile_image from "../../assets/images/fox.jpg";
+import SearchBar from "./Navbar/SearchBar/SearchBar";
+import Location from "./Navbar/Location/Location";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { loadUser, logOutUser } from "../../features/auth/authSlice";
 
 const Navbar = () => {
-  const navigate = useNavigate()
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // This state controls whether the user is logged in
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const {user, token} = useSelector(state => state.auth)
-  
+  const { userInformation, token } = useSelector((state) => state.auth);
+
   useEffect(() => {
-    console.log("user",user)
-    console.log("token",token)
-  })
+    if (token && !userInformation) {
+      dispatch(loadUser());
+    }
+  }, [dispatch, token, userInformation]);
+
+  useEffect(() => {
+    if (userInformation && Object.keys(userInformation).length > 0) {
+      setIsLoggedIn(true);
+      navigate("/", { replace: true });
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, [userInformation]);
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+
+  const handleSignOut = () => {
+    dispatch(logOutUser());
+    setIsLoggedIn(false);
+    setDropdownOpen(false);
+    navigate("/", { replace: true });
+  };
 
   return (
     <div>
@@ -29,14 +48,12 @@ const Navbar = () => {
           <div className="header-left flex items-center">
             <div className="header-bottom-col logo flex justify-start w-[100px] 2md:logo-[185px] lg:w-[200px] ">
               <div className="logo-inner w-[85px] ml-0 2md:mx-auto 2md:w-[130px]">
-                  <img onClick={() => navigate('/', {replace: true})} src={logo} alt="Amana Big Bazar" className="img-fluid" />
+                <img onClick={() => navigate("/", { replace: true })} src={logo} alt="Amana Big Bazar" className="img-fluid" />
               </div>
             </div>
             {/* Special Product Show for Large Devices */}
             <div className="special-product-button h-[40px] flex justify-between p-0 border-[3px] border-[#41b883] rounded-[14px] cursor-pointer ml-[5px] align-middle items-center font-times shadow-[0px_0px_5px_0px_#41b883]">
-              <button className="offer-btn bg-[#41b883] font-bold border-0 py-[8px] px-[10px] rounded-[10px] text-white text-font-14 tracking-[1px]">
-                OFFERS
-              </button>
+              <button className="offer-btn bg-[#41b883] font-bold border-0 py-[8px] px-[10px] rounded-[10px] text-white text-font-14 tracking-[1px]">OFFERS</button>
               <p className="offer-text px-[6px] text-[20px] font-bold text-[#41b883] leading-[1.3] self-center">99+</p>
             </div>
           </div>
@@ -54,35 +71,23 @@ const Navbar = () => {
                 <div className="dropdown relative">
                   <button className="profile-dropdown-btn flex items-center" onClick={toggleDropdown}>
                     {/* Show icon and text if not logged in */}
-                    {!isLoggedIn ? 
-                    (
+                    {!isLoggedIn ? (
                       <>
-                        <button onClick={() => navigate('/signin', {replace: true}) } >
-                        <i className="fas fa-user mr-0.5"></i> Sign In
+                        <button onClick={() => navigate("/signin", { replace: true })}>
+                          <i className="fas fa-user mr-0.5"></i> Sign In
                         </button>
-                        
                       </>
-                    ) 
-                    
-
-            //   <span
-            //   class="profile-button-inner-full"
-            //   v-if="user == null"
-            //   @click="signIn()"
-            //   ><router-link to="/signin" class="signin-link">
-            //     <span class="prflBtn-lrgDvc"
-            //       ><i class="fas fa-user" style="color: #41b883"></i> Sign
-            //       In</span
-            //     >
-            //     <span class="prflBtn-SmlDvc"
-            //       ><i class="fas fa-user" style="color: #41b883"></i
-            //     ></span> </router-link
-            // ></span>
-
-                    : (
+                    ) : (
                       <div className="pro-pic w-[35px] h-[35px] rounded-full bg-white text-center leading-[35px] shadow-[0_0_10px_2px_rgba(0,0,0,.08)]">
                         {/* Show profile picture if logged in */}
-                        <img src={profile_image} alt="profile-pic" className="img-fluid rounded-full" />
+                        {userInformation.info.avatar ? (
+                          <img src={userInformation.info.avatar} alt="profile-pic" className="img-fluid rounded-full" />
+                        ) : (
+                          <img src={profile_image} alt="profile-pic" className="img-fluid rounded-full" />
+                        )
+
+                        }
+                        
                       </div>
                     )}
                   </button>
@@ -90,35 +95,23 @@ const Navbar = () => {
                   {/* Dropdown Menu */}
                   {dropdownOpen && isLoggedIn && (
                     <div className="dropdown-menu absolute right-0 mt-2 w-[200px] bg-white border border-gray-300 rounded shadow-lg z-10">
-                      <a
-                        href="#"
-                        className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] "
-                      >
+                      <a href="#" className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] ">
                         <i className="text-font-14 hover:text-themeColor fas fa-user mr-1"></i> My Profile
                       </a>
-                      <a
-                        href="#"
-                        className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] "
-                      >
+                      <a href="#" className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] ">
                         <i className="text-font-14 hover:text-themeColor fas fa-box mr-1"></i> My Orders
                       </a>
-                      <a
-                        href="#"
-                        className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] "
-                      >
+                      <a href="#" className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] ">
                         <i className="text-font-14 hover:text-themeColor fas fa-lock mr-1"></i> Change Password
                       </a>
-                      <a
-                        href="#"
-                        className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] "
-                      >
+                      <a href="#" className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] ">
                         <i className="text-font-14 hover:text-themeColor fas fa-user-times mr-1"></i> Delete Account
                       </a>
                       {/* <div className="dropdown-divider my-2"></div> */}
                       <a
                         href="#"
                         className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] border-t border-t-[#e9ecef]"
-                        onClick={() => setIsLoggedIn(false)}
+                        onClick={handleSignOut}
                       >
                         <i className="text-font-14 hover:text-themeColor fas fa-sign-out-alt mr-1"></i> Sign Out
                       </a>
@@ -163,10 +156,7 @@ const Navbar = () => {
       {/* Categories and Offer */}
       <div className="bg-theme flex items-center">
         <div className="all-categories-btn">
-          <button
-            type="button"
-            className="btn btn-default text-uppercase text-white btn-block flex items-center justify-between font-weight-bold bg-theme"
-          >
+          <button type="button" className="btn btn-default text-uppercase text-white btn-block flex items-center justify-between font-weight-bold bg-theme">
             All Categories <i className="fas fa-list"></i>
           </button>
         </div>
