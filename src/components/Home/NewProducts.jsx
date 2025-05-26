@@ -45,7 +45,9 @@ const NewProducts = () => {
     <div className="py-10">
       <div className="home-new-products">
         <div className="sec-header flex items-center justify-between mb-4">
-          <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold mb-1 ">New Products</h2>
+          <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold mb-1 ">
+            New Products
+          </h2>
           <div className="flex space-x-2">
             <button className="prev-new-product carousel-nav bg-gray-300 text-themeColor w-8 h-8 flex items-center justify-center rounded-full hover:bg-themeColor hover:text-white">
               <i className="fas fa-angle-left"></i>
@@ -80,6 +82,7 @@ const NewProducts = () => {
             640: { slidesPerView: 3, spaceBetween: 15 },
             768: { slidesPerView: 4, spaceBetween: 15 },
             1024: { slidesPerView: 5, spaceBetween: 20 },
+            1500: { slidesPerView: 6, spaceBetween: 20 },
           }}
           className="mySwiper bg-sectionBackgroundLight"
         >
@@ -103,17 +106,22 @@ const NewProducts = () => {
                     />
                   </div>
                   <div className="p-4">
-                    <span className="product-type inline-block text-[#41b883] border border-[#41b883] text-xs px-2 py-1 rounded">
+                    <span className="product-type inline-block text-themeColor border border-themeColor text-xs px-2 py-1 rounded">
                       {product.unitType && product.unitType.shortform === "pc" ? "PC" : "KG"}
                     </span>
-                    <h3 className="card-title text-gray-700 text-base font-medium mt-2">{product.name}</h3>
+                    <h3 className="card-title text-gray-700 text-base font-medium mt-2 min-h-[48px] ">
+                      {product.name}
+                    </h3>
                     {product.discount > 0 && (
                       <div className="min-w-100">
-                        <del className="text-[#cd5c5c] text-left text-font-11">Tk. {product.price.sell}</del>
+                        <del className="text-badgeColor text-left text-font-11">Tk. {product.price.sell}</del>
+                        {/* text-[#cd5c5c] */}
                       </div>
                     )}
-                    <div className="price text-[#41b883] text-lg font-bold">Tk. {(product.price.sell - product.discount).toFixed(2)}</div>
-                    <button className="w-full bg-[#41b883] text-white text-sm font-medium py-2 mt-4 rounded hover:bg-[#41b899]">
+                    <div className="price text-themeColor text-lg font-bold">
+                      Tk. {(product.price.sell - product.discount).toFixed(2)}
+                    </div>
+                    <button className="w-full bg-themeColor text-white text-sm font-medium py-2 mt-4 rounded hover:bg-[#41b883]">
                       <i className="fas fa-shopping-basket"></i> Add To Cart
                     </button>
                   </div>

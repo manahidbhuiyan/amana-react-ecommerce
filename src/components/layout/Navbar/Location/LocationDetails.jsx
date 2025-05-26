@@ -25,7 +25,9 @@ const LocationDetails = ({ sendDataToParent, branches }) => {
 
   useEffect(() => {
     if (selectedArea && branches && branches.length > 0) {
-      const branchWithArea = branches.find((branch) => branch.areas && branch.areas.some((area) => area.name === selectedArea));
+      const branchWithArea = branches.find(
+        (branch) => branch.areas && branch.areas.some((area) => area.name === selectedArea)
+      );
       if (branchWithArea && branchWithArea.district) {
         setSelectedDistrict(branchWithArea.district.name);
       }
@@ -34,7 +36,7 @@ const LocationDetails = ({ sendDataToParent, branches }) => {
 
   useEffect(() => {
     if (selectedDistrict && branches.length > 0) {
-console.log("selectedDistrict",selectedDistrict)
+      console.log("selectedDistrict", selectedDistrict);
 
       const areas = branches
         .filter((branch) => {
@@ -43,8 +45,8 @@ console.log("selectedDistrict",selectedDistrict)
         })
         .flatMap((branch) => branch.areas || [])
         .sort((a, b) => a.name.localeCompare(b.name));
-console.log("areas",areas)
-console.log("branches",branches)
+      console.log("areas", areas);
+      console.log("branches", branches);
       setFilteredAreas(areas);
     } else {
       setFilteredAreas([]);
@@ -92,7 +94,9 @@ console.log("branches",branches)
           onChange={(e) => {
             const areaName = e.target.value;
             if (areaName) {
-              const selectedBranchId = branches.find((branch) => branch.areas && branch.areas.some((area) => area.name === areaName))?._id;
+              const selectedBranchId = branches.find(
+                (branch) => branch.areas && branch.areas.some((area) => area.name === areaName)
+              )?._id;
               handleAreaSelect(areaName, selectedBranchId);
             }
           }}

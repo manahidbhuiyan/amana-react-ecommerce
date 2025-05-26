@@ -60,7 +60,7 @@ const Navbar = () => {
             </div>
 
             {/* Header Right */}
-            <div className="w-1/5 flex items-center text-right justify-end gap-3 header-bottom-col">
+            <div className="w-1/5 flex items-center text-right justify-end gap-5 header-bottom-col">
               <Location></Location>
 
               <div className="profile-button min-w-[35px] 2md:min-w[65px]">
@@ -71,8 +71,9 @@ const Navbar = () => {
                       {/* Show icon and text if not logged in */}
                       {!isLoggedIn ? (
                         <>
-                          <div onClick={() => navigate("/signin", { replace: true })}>
-                            <i className="fas fa-user mr-0.5"></i> Sign In
+                          <div onClick={() => navigate("/signin", { replace: true })} className="flex justify-end gap-1 items-center text-font-17 text-themeColor ">
+                            {/* <i className="fas fa-user mr-0.5"></i> Sign In */}
+                            <i className="fa-regular fa-circle-user mr-0.5"></i> Login
                           </div>
                         </>
                       ) : (
