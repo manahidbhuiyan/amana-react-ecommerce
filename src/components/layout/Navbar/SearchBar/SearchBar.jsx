@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 
 const SearchBar = () => {
-    
   const [isClicked, setIsClicked] = useState(false);
 
   return (
-    <div className="header-bottom-col search-wrap flex-grow flex-shrink basis-auto hidden lg:block font-proxima">
-      <div className="header-bottom-mid bg-white rounded shadow-sm">
-        <form className="flex">
-          <div className="form-group w-1/4 mb-0 relative mr-2 mr-lg-3">
+    <div className="hidden lg:block bg-sectionBackgroundLight h-10 ">
+      <form className="w-full h-full flex rounded-md shadow-sm bg-sectionBackgroundLight  ">
+        {/* <div className="form-group w-1/4 mb-0 relative mr-2 mr-lg-3">
             <select
               className="w-full rounded-md py-2 px-4 text-[14px] text-[#495057] cursor-pointer appearance-none bg-white bg-no-repeat bg-right bg-[length:10px_10px] focus:outline-none"
               onClick={() => setIsClicked(true)}
@@ -41,24 +39,24 @@ const SearchBar = () => {
               </option>
             </select>
             <div className="absolute right-[-17px] top-1/2 transform -translate-y-1/2 bg-[#212529] w-[2px] h-[15px] z-10 hidden lg:block"></div>
-          </div>
-          <div className="form-group w-3/4 mb-0 flex-fill ml-3">
-            <div className="input-group w-full relative p-1">
-              <input
-                type="text"
-                className="form-control w-3/4 lg:w-4/5 border-0 px-2 placeholder:text-font-14 placeholder:text-[#495057] focus-visible:outline-0"
-                placeholder="Search for products..."
-              />
-              <div className="absolute right-2 top-1.5">
+          </div> */}
+        <div className="form-group w-full  ">
+          <div className="input-group flex justify-start gap-2 w-full h-full px-2">
+            <i className="fas fa-search h-5 w-5 text-font-17 mt-[12px] " style={{ color: "#41b883" }}></i>
+            <input
+              type="text"
+              className="form-control bg-sectionBackgroundLight w-full h-full text-font-17 text-textColorLight placeholder:text-font-17 placeholder:text-[#495057] focus-visible:outline-0"
+              placeholder="Search for products..."
+            />
+            {/* <div className="absolute right-2 top-1.5">
                 <button type="button" className="input-group-text text-font-14 text-[#495057]">
                   <i className="fas fa-search mr-2" style={{ color: "#41b883" }}></i>
                   Search
                 </button>
-              </div>
-            </div>
+              </div> */}
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   );
 };

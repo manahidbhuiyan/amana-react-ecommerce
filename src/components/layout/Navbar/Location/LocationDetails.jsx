@@ -34,6 +34,8 @@ const LocationDetails = ({ sendDataToParent, branches }) => {
 
   useEffect(() => {
     if (selectedDistrict && branches.length > 0) {
+console.log("selectedDistrict",selectedDistrict)
+
       const areas = branches
         .filter((branch) => {
           const match = branch.district && branch.district.name === selectedDistrict;
@@ -41,7 +43,8 @@ const LocationDetails = ({ sendDataToParent, branches }) => {
         })
         .flatMap((branch) => branch.areas || [])
         .sort((a, b) => a.name.localeCompare(b.name));
-
+console.log("areas",areas)
+console.log("branches",branches)
       setFilteredAreas(areas);
     } else {
       setFilteredAreas([]);

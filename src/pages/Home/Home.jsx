@@ -3,11 +3,11 @@ import Hero from "../../components/Home/Hero";
 import NewProducts from "../../components/Home/NewProducts";
 import SpecialOffers from "../../components/Home/SpecialOffers";
 import Location from "../../components/layout/Navbar/Location/Location";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Home = () => {
-  const locationRef  = useRef(null);
+  const locationRef = useRef(null);
   const localSelectArea = localStorage.getItem("selectedArea");
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const Home = () => {
   }, [localSelectArea]);
 
   return (
-    <div className="mt-10 px-4">
+    <div className="mt-10 px-4 bg-sectionBackgroundLight">
       <ToastContainer />
       {localSelectArea ? (
         <>

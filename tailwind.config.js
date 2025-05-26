@@ -12,7 +12,10 @@ export default {
         'times': ['"Times New Roman"', 'serif'],
       },
       colors: {
-        themeColor: "#41b883",
+        bodyColor: "#FAFAFA" ,
+        sectionBackground: "#FAFAFA",
+        sectionBackgroundLight: "#f0f5ff",
+        themeColor: "#059669 ",
         themeColorLight: "#6aca9f",
         themeColorSecondary: "#ff738e",
         themeColor2: "#35495e",
@@ -21,6 +24,14 @@ export default {
         textColor: "#212529",
         textColorLight: "#444",
         buttonColor: '#22C55E',
+
+        badgeColor: "#FF6B35",
+
+        // Sale/discount badge	#00C853
+        // Offer button	#00C853
+        // “Add to Cart” button	#43A047
+
+        
       },
       animation: {
         marquee: "marquee 15s linear infinite",
