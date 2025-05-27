@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import notFoundImage from "../../assets/images/products/no-image.jpg";
 import redRibbon from "../../assets/images/red-ribbon.png";
 import { loadProductData } from "../../features/products/productSlice";
+import ProductLoadCard from "../common/ProductLoadCard";
 
 // swiper
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -14,6 +15,7 @@ import "swiper/css/navigation";
 const SpecialOffers = () => {
   const [slides, setSlides] = useState([]);
   const [loading, setLoading] = useState(true);
+  // const [DisplaySlide, setDisplaySlide] = useState([]);
 
   const dispatch = useDispatch();
   const { specialOffers } = useSelector((state) => state.products);
@@ -22,7 +24,7 @@ const SpecialOffers = () => {
     let queryString = {
       specialOffer: true,
     };
-    let branchId = "6236fbf5bcadba0c84549883";
+    let branchId = localStorage.branchId
 
     dispatch(loadProductData({ pageNo: 1, branchId, queryString, queryType: "specialOffer" }));
   }, [dispatch]);
@@ -31,6 +33,16 @@ const SpecialOffers = () => {
     if (specialOffers && specialOffers.count > 0) {
       setSlides(specialOffers);
       setLoading(false);
+
+      let random_Start = Math.floor(Math.random() * 7);
+      let end_count = random_Start + 7;
+      let new_random_number = specialOffers.data.length <= 7 ? 0 : specialOffers.data.length - 7;
+      let new_end_count = specialOffers.data.length;
+
+      let slicedOffers = {};
+      slicedOffers.count = specialOffers.count;
+      slicedOffers.data = end_count > new_end_count ? specialOffers.data.slice(new_random_number, new_end_count) : specialOffers.data.slice(random_Start, end_count);
+      setSlides(slicedOffers);
     }
   }, [specialOffers]);
 
@@ -46,9 +58,7 @@ const SpecialOffers = () => {
     <div className="py-10">
       <div className="home-new-products">
         <div className="sec-header flex items-center justify-between mb-4">
-          <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold mb-1 ">
-            Special Products
-          </h2>
+          <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold mb-1 ">Special Products</h2>
           <div className="flex space-x-2">
             <button className="prev-special-offer carousel-nav bg-gray-300 text-gray-700 w-8 h-8 flex items-center justify-center rounded-full hover:bg-green-500 hover:text-white">
               <i className="fas fa-angle-left"></i>
@@ -61,10 +71,13 @@ const SpecialOffers = () => {
 
         {/* Replace grid with Swiper */}
         <Swiper
-          lazy={true}
+          lazy={{
+            loadPrevNext: true,
+            loadPrevNextAmount: 1,
+          }}
           slidesPerView={7}
           spaceBetween={20}
-          loop={true}
+          loop={false}
           pagination={{
             clickable: true,
           }}
@@ -85,16 +98,12 @@ const SpecialOffers = () => {
             1024: { slidesPerView: 5, spaceBetween: 20 },
             1500: { slidesPerView: 6, spaceBetween: 20 },
           }}
-          className="mySwiper"
+          className="mySwiper bg-sectionBackgroundLight"
         >
           {slides.count > 0 &&
             slides.data.map((product, index) => (
               <SwiperSlide key={product._id || index}>
-                <div
-                  className={`card product-card bg-white shadow-lg rounded-lg overflow-hidden ${
-                    product.discount > 0 ? "h-[424px]" : "h-[400px]"
-                  }`}
-                >
+                <div className={`card product-card bg-white shadow-lg rounded-lg overflow-hidden h-[400px]`}>
                   <div className="relative">
                     {product.discount > 0 && (
                       <div
@@ -113,20 +122,26 @@ const SpecialOffers = () => {
                     />
                   </div>
                   <div className="p-4">
-                    <span className="product-type inline-block text-themeColor border border-themeColor text-xs px-2 py-1 rounded">
-                      {product.unitType && product.unitType.shortform === "pc" ? "PC" : "KG"}
-                    </span>
-                    <h3 className="card-title text-gray-700 text-base font-medium mt-2 min-h-[48px] ">
-                      {product.name}
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">{product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}</span>
+                    </div>
+                    <h3 className="card-title text-textColor text-base font-bold mt-2 min-h-[48px] line-clamp-2 leading-6">
+                      {product.name
+                        .split(" ")
+                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(" ")}
                     </h3>
-                    {product.discount > 0 && (
-                      <div className="min-w-100">
-                        <del className="text-badgeColor text-left text-font-11">Tk. {product.price.sell}</del>
+                    {product.discount > 0 ? (
+                      <div className="flex justify-start gap-3 items-center pt-2">
+                        <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {(product.price.sell - product.discount).toFixed(2)}</div>
+                        <del className="text-gray-400 text-sm leading-normal">Tk. {product.price.sell.toFixed(2)}</del>
+                      </div>
+                    ) : (
+                      <div className="flex justify-start gap-2 items-center pt-2">
+                        <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {product.price.sell.toFixed(2)}</div>
                       </div>
                     )}
-                    <div className="price text-themeColor  text-lg font-bold">
-                      Tk. {(product.price.sell - product.discount).toFixed(2)}
-                    </div>
+
                     <button className="w-full bg-themeColor text-white text-sm font-medium py-2 mt-4 rounded hover:bg-[#41b899]">
                       <i className="fas fa-shopping-basket"></i> Add To Cart
                     </button>
@@ -134,6 +149,9 @@ const SpecialOffers = () => {
                 </div>
               </SwiperSlide>
             ))}
+          <SwiperSlide key="load-more-card">
+            <ProductLoadCard />
+          </SwiperSlide>
         </Swiper>
       </div>
     </div>

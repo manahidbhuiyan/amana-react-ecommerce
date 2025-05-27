@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import notFoundImage from "../../assets/images/products/no-image.jpg";
 import { loadProductData } from "../../features/products/productSlice";
+import ProductLoadCard from "../common/ProductLoadCard";
+
 
 // swiper
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -21,7 +23,7 @@ const NewProducts = () => {
     let queryString = {
       newProduct: true,
     };
-    let branchId = "6236fbf5bcadba0c84549883";
+    let branchId = localStorage.branchId
 
     dispatch(loadProductData({ pageNo: 1, branchId, queryString, queryType: "newProduct" }));
   }, [dispatch]);
@@ -30,6 +32,16 @@ const NewProducts = () => {
     if (newProducts && newProducts.count > 0) {
       setSlides(newProducts);
       setLoading(false);
+            
+      let random_Start = Math.floor(Math.random() * 7);
+      let end_count = random_Start + 7;
+      let new_random_number = newProducts.data.length <= 7 ? 0 : newProducts.data.length - 7;
+      let new_end_count = newProducts.data.length;
+
+      let slicedOffers = {};
+      slicedOffers.count = newProducts.count;
+      slicedOffers.data = end_count > new_end_count ? newProducts.data.slice(new_random_number, new_end_count) : newProducts.data.slice(random_Start, end_count);
+      setSlides(slicedOffers);
     }
   }, [newProducts]);
 
@@ -45,9 +57,7 @@ const NewProducts = () => {
     <div className="py-10">
       <div className="home-new-products">
         <div className="sec-header flex items-center justify-between mb-4">
-          <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold mb-1 ">
-            New Products
-          </h2>
+          <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold mb-1 ">New Products</h2>
           <div className="flex space-x-2">
             <button className="prev-new-product carousel-nav bg-gray-300 text-themeColor w-8 h-8 flex items-center justify-center rounded-full hover:bg-themeColor hover:text-white">
               <i className="fas fa-angle-left"></i>
@@ -60,10 +70,13 @@ const NewProducts = () => {
 
         {/* Replace grid with Swiper */}
         <Swiper
-          lazy={true}
+          lazy={{
+            loadPrevNext: true,
+            loadPrevNextAmount: 1,
+          }}
           slidesPerView={7}
           spaceBetween={20}
-          loop={true}
+          loop={false}
           pagination={{
             clickable: true,
           }}
@@ -106,28 +119,36 @@ const NewProducts = () => {
                     />
                   </div>
                   <div className="p-4">
-                    <span className="product-type inline-block text-themeColor border border-themeColor text-xs px-2 py-1 rounded">
-                      {product.unitType && product.unitType.shortform === "pc" ? "PC" : "KG"}
-                    </span>
-                    <h3 className="card-title text-gray-700 text-base font-medium mt-2 min-h-[48px] ">
-                      {product.name}
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">{product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}</span>
+                    </div>
+                    <h3 className="card-title text-textColor text-base font-bold mt-2 min-h-[48px] line-clamp-2 leading-6">
+                      {product.name
+                        .split(" ")
+                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(" ")}
                     </h3>
-                    {product.discount > 0 && (
-                      <div className="min-w-100">
-                        <del className="text-badgeColor text-left text-font-11">Tk. {product.price.sell}</del>
-                        {/* text-[#cd5c5c] */}
+                    {product.discount > 0 ? (
+                      <div className="flex justify-start gap-3 items-center pt-2">
+                        <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {(product.price.sell - product.discount).toFixed(2)}</div>
+                        <del className="text-gray-400 text-sm leading-normal">Tk. {product.price.sell.toFixed(2)}</del>
+                      </div>
+                    ) : (
+                      <div className="flex justify-start gap-2 items-center pt-2">
+                        <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {product.price.sell.toFixed(2)}</div>
                       </div>
                     )}
-                    <div className="price text-themeColor text-lg font-bold">
-                      Tk. {(product.price.sell - product.discount).toFixed(2)}
-                    </div>
-                    <button className="w-full bg-themeColor text-white text-sm font-medium py-2 mt-4 rounded hover:bg-[#41b883]">
+
+                    <button className="w-full bg-themeColor text-white text-sm font-medium py-2 mt-4 rounded hover:bg-[#41b899]">
                       <i className="fas fa-shopping-basket"></i> Add To Cart
                     </button>
                   </div>
                 </div>
               </SwiperSlide>
             ))}
+            <SwiperSlide key="load-more-card">
+            <ProductLoadCard />
+          </SwiperSlide>
         </Swiper>
       </div>
     </div>
