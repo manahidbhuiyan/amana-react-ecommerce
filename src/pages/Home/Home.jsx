@@ -31,7 +31,7 @@ const Home = () => {
   }, [localSelectArea]);
 
   return (
-    <div className="mt-10 px-4 bg-sectionBackgroundLight">
+    <div className=" bg-sectionBackgroundLight">
       <ToastContainer />
       {localSelectArea ? (
         <>

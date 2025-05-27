@@ -1,24 +1,20 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Home from '../pages/Home/Home';
 import Cart from '../pages/Cart/Cart';
 import Product from '../pages/Products/Product';
-import SignIn from '../pages/Auth/SignIn'; // If you have authentication page
-import Header from '../components/layout/Header'; // Optional: Add header for all pages
-import Footer from '../components/layout/Footer'; // Optional: Add footer for all pages
+import SignIn from '../pages/Auth/SignIn';
+import ProductDetails from '../pages/Products/ProductDetails';
 
 const AppRoutes = () => {
   return (
-    <Router>
-      <Header /> {/* Optional: Header will appear in all pages */}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/product/:id" element={<Product />} />
-        <Route path="/signin" element={<SignIn />} />
-      </Routes>
-      <Footer /> {/* Optional: Footer will appear in all pages */}
-    </Router>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/product/:id" element={<Product />} />
+      <Route path="/signin" element={<SignIn />} />
+      <Route path="/product/:category/:subcategory/:slug/:barcode" element={<ProductDetails />} />
+    </Routes>
   );
 };
 

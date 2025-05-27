@@ -39,7 +39,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="slider-container relative w-full mt-[170px] ">
+    <div className="slider-container relative w-full ">
       <Slider {...settings} className="relative">
         <div className="focus-visible:outline-none">
           <img src={banner_1} alt="Slide 1" className="w-full h-[400px] object-fill " />

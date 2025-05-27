@@ -4,6 +4,7 @@ import notFoundImage from "../../assets/images/products/no-image.jpg";
 import redRibbon from "../../assets/images/red-ribbon.png";
 import { loadProductData } from "../../features/products/productSlice";
 import ProductLoadCard from "../common/ProductLoadCard";
+import { useNavigate } from "react-router-dom";
 
 // swiper
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -17,6 +18,7 @@ const SpecialOffers = () => {
   const [loading, setLoading] = useState(true);
   // const [DisplaySlide, setDisplaySlide] = useState([]);
 
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { specialOffers } = useSelector((state) => state.products);
 
@@ -24,7 +26,7 @@ const SpecialOffers = () => {
     let queryString = {
       specialOffer: true,
     };
-    let branchId = localStorage.branchId
+    let branchId = localStorage.branchId;
 
     dispatch(loadProductData({ pageNo: 1, branchId, queryString, queryType: "specialOffer" }));
   }, [dispatch]);
@@ -41,10 +43,19 @@ const SpecialOffers = () => {
 
       let slicedOffers = {};
       slicedOffers.count = specialOffers.count;
-      slicedOffers.data = end_count > new_end_count ? specialOffers.data.slice(new_random_number, new_end_count) : specialOffers.data.slice(random_Start, end_count);
+      slicedOffers.data =
+        end_count > new_end_count
+          ? specialOffers.data.slice(new_random_number, new_end_count)
+          : specialOffers.data.slice(random_Start, end_count);
       setSlides(slicedOffers);
     }
   }, [specialOffers]);
+
+  const moveToProductDetails = (product) => {
+    const link = `/product/${product.category.name}/${product.subcategory.name}/${product.slug}/${product.barcode}`;
+    console.log("link", link);
+    navigate(`/product/${product.category.name}/${product.subcategory.name}/${product.slug}/${product.barcode}`);
+  };
 
   if (loading) {
     return (
@@ -58,7 +69,9 @@ const SpecialOffers = () => {
     <div className="py-10">
       <div className="home-new-products">
         <div className="sec-header flex items-center justify-between mb-4">
-          <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold mb-1 ">Special Products</h2>
+          <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold mb-1 ">
+            Special Products
+          </h2>
           <div className="flex space-x-2">
             <button className="prev-special-offer carousel-nav bg-gray-300 text-gray-700 w-8 h-8 flex items-center justify-center rounded-full hover:bg-green-500 hover:text-white">
               <i className="fas fa-angle-left"></i>
@@ -123,22 +136,33 @@ const SpecialOffers = () => {
                   </div>
                   <div className="p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">{product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}</span>
+                      <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">
+                        {product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}
+                      </span>
                     </div>
-                    <h3 className="card-title text-textColor text-base font-bold mt-2 min-h-[48px] line-clamp-2 leading-6">
+
+                    <h3
+                      onClick={() => moveToProductDetails(product)}
+                      className="card-title text-textColor hover:text-themeColor text-base font-bold mt-2 min-h-[48px] line-clamp-2 leading-6 cursor-pointer"
+                    >
                       {product.name
                         .split(" ")
                         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                         .join(" ")}
                     </h3>
+
                     {product.discount > 0 ? (
                       <div className="flex justify-start gap-3 items-center pt-2">
-                        <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {(product.price.sell - product.discount).toFixed(2)}</div>
+                        <div className="price text-themeColor text-lg font-bold leading-normal">
+                          Tk. {(product.price.sell - product.discount).toFixed(2)}
+                        </div>
                         <del className="text-gray-400 text-sm leading-normal">Tk. {product.price.sell.toFixed(2)}</del>
                       </div>
                     ) : (
                       <div className="flex justify-start gap-2 items-center pt-2">
-                        <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {product.price.sell.toFixed(2)}</div>
+                        <div className="price text-themeColor text-lg font-bold leading-normal">
+                          Tk. {product.price.sell.toFixed(2)}
+                        </div>
                       </div>
                     )}
 
