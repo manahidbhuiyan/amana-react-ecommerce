@@ -8,7 +8,7 @@ const App = () => {
   return (
     <BrowserRouter> {/* ✅ Everything inside Router */}
       <Header />
-      <main className="pt-[170px] min-h-screen px-4 bg-sectionBackgroundLight">
+      <main className="pt-[200px] min-h-screen px-4 bg-sectionBackgroundLight">
         <AppRoutes />
       </main>
       <Footer />

@@ -14,3 +14,13 @@ export const getProducts = async (pageNo, branchID, queryString) => {
         throw error;
     }
 };
+
+export const getSingleProduct = async (slug, branchID, barcode) => {
+    try {
+        let requestLink = '/api/product/single/slug/' + slug + '?branch=' + branchID + '&barcode=' + barcode
+        const res = await axios.get(requestLink);
+        return res.data;
+    } catch (error) {
+        throw error;
+    }
+}

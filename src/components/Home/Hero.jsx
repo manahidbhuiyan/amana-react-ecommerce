@@ -42,10 +42,10 @@ const Hero = () => {
     <div className="slider-container relative w-full ">
       <Slider {...settings} className="relative">
         <div className="focus-visible:outline-none">
-          <img src={banner_1} alt="Slide 1" className="w-full h-[400px] object-fill " />
+          <img src={banner_2} alt="Slide 2" className="w-full h-[400px] object-fill" />
         </div>
         <div className="focus-visible:outline-none">
-          <img src={banner_2} alt="Slide 2" className="w-full h-[400px] object-fill" />
+          <img src={banner_1} alt="Slide 1" className="w-full h-[400px] object-fill " />
         </div>
         <div className="focus-visible:outline-none">
           <img src={banner_3} alt="Slide 2" className="w-full h-[400px] object-fill" />
