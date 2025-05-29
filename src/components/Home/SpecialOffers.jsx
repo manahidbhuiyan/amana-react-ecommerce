@@ -43,17 +43,12 @@ const SpecialOffers = () => {
 
       let slicedOffers = {};
       slicedOffers.count = specialOffers.count;
-      slicedOffers.data =
-        end_count > new_end_count
-          ? specialOffers.data.slice(new_random_number, new_end_count)
-          : specialOffers.data.slice(random_Start, end_count);
+      slicedOffers.data = end_count > new_end_count ? specialOffers.data.slice(new_random_number, new_end_count) : specialOffers.data.slice(random_Start, end_count);
       setSlides(slicedOffers);
     }
   }, [specialOffers]);
 
   const moveToProductDetails = (product) => {
-    const link = `/product/${product.category.name}/${product.subcategory.name}/${product.slug}/${product.barcode}`;
-    console.log("link", link);
     navigate(`/product/${product.category.name}/${product.subcategory.name}/${product.slug}/${product.barcode}`);
   };
 
@@ -69,10 +64,8 @@ const SpecialOffers = () => {
     <div className="py-10">
       <div className="home-new-products">
         <div className="sec-header flex items-center justify-between mb-4">
-          <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold mb-1 ">
-            Special Products
-          </h2>
-           <div className="flex space-x-2">
+          <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold mb-1 ">Special Products</h2>
+          <div className="flex space-x-2">
             <button className="prev-new-product carousel-nav bg-gray-300 text-themeColor w-8 h-8 flex items-center justify-center rounded-full hover:bg-themeColor hover:text-white">
               <i className="fas fa-angle-left"></i>
             </button>
@@ -136,9 +129,7 @@ const SpecialOffers = () => {
                   </div>
                   <div className="p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">
-                        {product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}
-                      </span>
+                      <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">{product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}</span>
                     </div>
 
                     <h3
@@ -153,16 +144,12 @@ const SpecialOffers = () => {
 
                     {product.discount > 0 ? (
                       <div className="flex justify-start gap-3 items-center pt-2">
-                        <div className="price text-themeColor text-lg font-bold leading-normal">
-                          Tk. {(product.price.sell - product.discount).toFixed(2)}
-                        </div>
+                        <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {(product.price.sell - product.discount).toFixed(2)}</div>
                         <del className="text-gray-400 text-sm leading-normal">Tk. {product.price.sell.toFixed(2)}</del>
                       </div>
                     ) : (
                       <div className="flex justify-start gap-2 items-center pt-2">
-                        <div className="price text-themeColor text-lg font-bold leading-normal">
-                          Tk. {product.price.sell.toFixed(2)}
-                        </div>
+                        <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {product.price.sell.toFixed(2)}</div>
                       </div>
                     )}
 

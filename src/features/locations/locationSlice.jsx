@@ -7,6 +7,7 @@ const initialState = {
   isError: false,
   selectedArea: "",
   branchId: null,
+  selectedBranch: null,
   error: "",
 };
 
@@ -16,7 +17,7 @@ export const fetchBranches = createAsyncThunk("locations/fetchBranches", async (
 });
 
 const locationSlice = createSlice({
-  name: "locations",
+  name: "location",
   initialState,
   reducers: {
     // Reducer to set selected area
@@ -26,6 +27,10 @@ const locationSlice = createSlice({
     // Reducer to set selected branchId
     setBranchId(state, action) {
       state.branchId = action.payload;
+    },
+    // Reducer to set selected selectedBranch
+    setSelectedBranch(state, action) {
+      state.selectedBranch = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -48,6 +53,6 @@ const locationSlice = createSlice({
 });
 
 // Export actions
-export const { setSelectedArea, setBranchId } = locationSlice.actions;
+export const { setSelectedArea, setBranchId, setSelectedBranch } = locationSlice.actions;
 
 export default locationSlice.reducer;

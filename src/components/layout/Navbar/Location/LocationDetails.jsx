@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedArea, setBranchId } from "../../../../features/locations/locationSlice";
+import { setSelectedArea, setBranchId, setSelectedBranch } from "../../../../features/locations/locationSlice";
 
 const LocationDetails = ({ sendDataToParent, branches }) => {
   const dispatch = useDispatch();
-  const { selectedArea, branchId } = useSelector((state) => state.location);
+  const { selectedArea, branchId, selectedBranch } = useSelector((state) => state.location);
 
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [filterAreas, setFilteredAreas] = useState([]);
@@ -34,8 +34,6 @@ const LocationDetails = ({ sendDataToParent, branches }) => {
 
   useEffect(() => {
     if (selectedDistrict && branches.length > 0) {
-      console.log("selectedDistrict", selectedDistrict);
-
       const areas = branches
         .filter((branch) => {
           const match = branch.district && branch.district.name === selectedDistrict;
@@ -43,22 +41,22 @@ const LocationDetails = ({ sendDataToParent, branches }) => {
         })
         .flatMap((branch) => branch.areas || [])
         .sort((a, b) => a.name.localeCompare(b.name));
-      console.log("areas", areas);
-      console.log("branches", branches);
       setFilteredAreas(areas);
     } else {
       setFilteredAreas([]);
     }
   }, [selectedDistrict, branches]);
 
-  const handleAreaSelect = (areaName, selectedBranchId) => {
+  const handleAreaSelect = (areaName, selectedBranchId, selectedBranch) => {
     dispatch(setSelectedArea(areaName));
     dispatch(setBranchId(selectedBranchId));
+    dispatch(setSelectedBranch(selectedBranch));
   };
 
   const branchSelect = () => {
     if (branchId) localStorage.setItem("branchId", branchId);
     if (selectedArea) localStorage.setItem("selectedArea", selectedArea);
+    if (selectedBranch) localStorage.setItem("selectedBranch", JSON.stringify(selectedBranch));
   };
 
   const handleDistrictChange = (e) => {
@@ -92,8 +90,9 @@ const LocationDetails = ({ sendDataToParent, branches }) => {
           onChange={(e) => {
             const areaName = e.target.value;
             if (areaName) {
-              const selectedBranchId = branches.find((branch) => branch.areas && branch.areas.some((area) => area.name === areaName))?._id;
-              handleAreaSelect(areaName, selectedBranchId);
+              const selectedBranch = branches.find((branch) => branch.areas && branch.areas.some((area) => area.name === areaName));
+              const selectedBranchId = selectedBranch?._id || null;
+              handleAreaSelect(areaName, selectedBranchId, selectedBranch);
             }
           }}
           className="w-full p-2 border rounded-lg"

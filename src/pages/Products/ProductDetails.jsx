@@ -4,15 +4,18 @@ import { useParams } from "react-router-dom";
 import { loadProductSingleData } from "../../features/products/productSlice";
 import { ChevronLeft, ChevronRight, ShoppingCart, Plus, Minus, Star, Heart, Share2, Truck, Shield, RotateCcw } from "lucide-react";
 import notFoundImage from "../../assets/images/products/no-image.jpg";
+import { useNavigate } from "react-router-dom";
 
 const ProductDetails = () => {
   const { category, subcategory, slug, barcode } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const branchId = localStorage.branchId;
 
   // Local state
   const [singleProductData, setSingleProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
+
   // Dummy data - replace with your Redux state
   const [dummySingleProduct] = useState({
     name: "Premium Wireless Headphones",
@@ -36,17 +39,20 @@ const ProductDetails = () => {
 
   const { singleProduct } = useSelector((state) => state.products);
 
+  // FIX 1: Add all dependencies to useEffect
   useEffect(() => {
-    console.log("called");
-    dispatch(loadProductSingleData({ branchId, slug, barcode }));
-  }, [dispatch]);
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    if (branchId && slug && barcode) {
+      dispatch(loadProductSingleData({ branchId, slug, barcode }));
+    }
+  }, [dispatch, branchId, slug, barcode]); // Added missing dependencies
 
   useEffect(() => {
     if (singleProduct) {
       setSingleProduct(singleProduct.data);
-      setRelatedProducts(singleProduct.related);
+      setRelatedProducts(singleProduct.related || []);
     }
-  }, [singleProduct, singleProductData, relatedProducts]);
+  }, [singleProduct]);
 
   // State for image gallery
   const [selectedImage, setSelectedImage] = useState(0);
@@ -56,6 +62,27 @@ const ProductDetails = () => {
   // State for related products slider
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Add missing state and functions
+  const [quantity, setQuantity] = useState(1);
+  const [isInCart, setIsInCart] = useState(false);
+
+  const updateQuantity = (action) => {
+    if (action === "plus" && quantity < singleProductData?.quantity) {
+      setQuantity(quantity + 1);
+    } else if (action === "minus" && quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  const addToCart = () => {
+    setIsLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsInCart(true);
+      setIsLoading(false);
+    }, 1000);
+  };
 
   const handleImageHover = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -72,8 +99,12 @@ const ProductDetails = () => {
     setCurrentSlide((prev) => (prev - 1 < 0 ? Math.ceil(relatedProducts.length / 4) - 1 : prev - 1));
   };
 
-  const finalPrice = singleProductData?.price.sell - singleProductData?.discount;
-  const discountPercentage = Math.round((singleProductData?.discount / singleProductData?.price.sell) * 100);
+  const finalPrice = singleProductData?.price?.sell - (singleProductData?.discount || 0);
+  const discountPercentage = singleProductData?.discount ? Math.round((singleProductData.discount / singleProductData.price.sell) * 100) : 0;
+
+  const moveToProductDetails = (product) => {
+    navigate(`/product/${product.category.name}/${product.subcategory.name}/${product.slug}/${product.barcode}`);
+  };
 
   return (
     <div className="bg-sectionBackgroundLight min-h-screen">
@@ -101,9 +132,10 @@ const ProductDetails = () => {
               {/* Main Image */}
               <div className="relative bg-gray-100 rounded-lg overflow-hidden group">
                 <div className="aspect-square relative cursor-zoom-in" onMouseEnter={() => setIsZoomed(true)} onMouseLeave={() => setIsZoomed(false)} onMouseMove={handleImageHover}>
+                  {/* singleProductData?.images?.length > 0 ? singleProductData.images[selectedImage] :  */}
                   <img
-                    src={singleProductData?.images?.[selectedImage] ?? dummySingleProduct.images[selectedImage]}
-                    alt={singleProductData?.name}
+                    src={dummySingleProduct.images[selectedImage]}
+                    alt={singleProductData?.name || dummySingleProduct.name}
                     className={`w-full h-full object-cover transition-transform duration-300 ${isZoomed ? "scale-150" : "scale-100"}`}
                     style={
                       isZoomed
@@ -129,11 +161,14 @@ const ProductDetails = () => {
                 </div>
               </div>
 
-              {/* Thumbnail Images */}
+              {/* FIX 2: Thumbnail Images - Fixed array reference and added proper keys */}
+
+              {/* singleProductData?.images?.length > 0 ? singleProductData.images :  */}
+
               <div className="grid grid-cols-4 gap-3">
-                {(singleProductData?.images[0] || dummySingleProduct.images).map((image, index) => (
+                {dummySingleProduct.images.map((image, index) => (
                   <button
-                    key={index}
+                    key={`thumbnail-${index}`}
                     onClick={() => setSelectedImage(index)}
                     className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                       selectedImage === index ? "border-blue-500 ring-2 ring-blue-200" : "border-gray-200 hover:border-gray-300"
@@ -150,26 +185,14 @@ const ProductDetails = () => {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
                   {singleProductData?.name
-                    .split(" ")
+                    ?.split(" ")
                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                     .join(" ")}
                 </h1>
 
-                {/* Rating & Reviews */}
-                {/* <div className="flex items-center space-x-3 mb-4">
-                  <div className="flex items-center">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className={`w-5 h-5 ${i < Math.floor(singleProduct.rating) ? "text-yellow-400 fill-current" : "text-gray-300"}`} />
-                    ))}
-                  </div>
-                  <span className="text-gray-600">
-                    {singleProduct.rating} ({singleProduct.reviews} reviews)
-                  </span>
-                </div> */}
-
                 {/* Stock Status */}
                 <div className="mb-4">
-                  {singleProductData?.maxQuantity > 0 ? (
+                  {singleProductData?.quantity > 0 ? (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">✓ In Stock ({singleProductData?.maxQuantity} available)</span>
                   ) : (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">✗ Out of Stock</span>
@@ -179,13 +202,13 @@ const ProductDetails = () => {
                 {/* Brand & SKU */}
                 <div className="space-y-2 text-gray-600">
                   <p>
-                    <span className="font-medium">Brand:</span> {singleProductData?.brand.name}
+                    <span className="font-medium">Brand:</span> {singleProductData?.brand?.name}
                   </p>
                   <p>
                     <span className="font-medium">SKU:</span> {singleProductData?.barcode}
                   </p>
                   <p>
-                    <span className="font-medium">Unit:</span> {singleProductData?.unitType.shortform == "pc" ? "Piece" : "Kilogram"}
+                    <span className="font-medium">Unit:</span> {singleProductData?.unitType?.shortform === "pc" ? "Piece" : "Kilogram"}
                   </p>
                 </div>
               </div>
@@ -193,14 +216,18 @@ const ProductDetails = () => {
               {/* Price */}
               <div className="bg-gray-50 p-6 rounded-lg">
                 <div className="flex items-center space-x-4">
-                  <span className="text-3xl font-bold text-gray-900">৳{finalPrice.toFixed(2)}</span>
-                  {singleProductData?.discount > 0 && <span className="text-xl text-gray-500 line-through">৳{singleProductData?.price.sell.toFixed(2)}</span>}
-                  {singleProductData?.discount > 0 && <span className="text-lg font-semibold text-green-600">Save ৳{singleProductData?.discount.toFixed(2)}</span>}
+                  <span className="text-3xl font-bold text-gray-900">৳{finalPrice?.toFixed(2)}</span>
+                  {singleProductData?.discount > 0 && (
+                    <>
+                      <span className="text-xl text-gray-500 line-through">৳{singleProductData?.price?.sell?.toFixed(2)}</span>
+                      <span className="text-lg font-semibold text-green-600">Save ৳{singleProductData?.discount?.toFixed(2)}</span>
+                    </>
+                  )}
                 </div>
               </div>
 
               {/* Quantity & Add to Cart */}
-              {singleProductData?.maxQuantity > 0 && (
+              {singleProductData?.quantity > 0 && (
                 <div className="space-y-4">
                   {!isInCart ? (
                     <div className="flex items-center space-x-4">
@@ -216,7 +243,7 @@ const ProductDetails = () => {
 
                       <button
                         onClick={addToCart}
-                        className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+                        className="flex-1 bg-themeColor text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#41b899] transition-colors flex items-center justify-center space-x-2"
                       >
                         <ShoppingCart className="w-5 h-5" />
                         <span>Add to Cart</span>
@@ -234,12 +261,14 @@ const ProductDetails = () => {
                             <Plus className="w-4 h-4" />
                           </button>
                         </div>
-                        <span className="text-green-700 font-medium">in Cart</span>
+                        <span className="text-themeColor font-medium">in Cart</span>
                       </div>
                     </div>
                   )}
 
-                  <button className="w-full bg-orange-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-600 transition-colors">Buy Now</button>
+                  {/* <button className="w-full bg-orange-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-600 transition-colors">
+                    Buy Now
+                  </button> */}
                 </div>
               )}
 
@@ -264,85 +293,81 @@ const ProductDetails = () => {
               {/* Description */}
               <div className="border-t pt-6">
                 <h3 className="text-lg font-semibold mb-3">Description</h3>
-                <p className="text-gray-600 leading-relaxed">{singleProductData?.description !== "" ? singleProductData?.description : dummySingleProduct.description}</p>
+                <p className="text-gray-600 leading-relaxed">{singleProductData?.description || dummySingleProduct.description}</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Related Products */}
-        <div className="">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-font-32 font-bold text-themeColor leading-none ">Some Of Similar Products</h2>
-            <div className="flex space-x-2">
-              <button onClick={prevSlide} className="group p-2 border border-gray-300 rounded-lg hover:bg-themeColor transition-colors">
-                <ChevronLeft className="w-5 h-5 group-hover:text-white" />
-              </button>
-              <button onClick={nextSlide} className="group p-2 border border-gray-300 rounded-lg hover:bg-themeColor transition-colors">
-                <ChevronRight className="w-5 h-5 group-hover:text-white" />
-              </button>
+        {relatedProducts.length > 0 && (
+          <div className="">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-font-32 font-bold text-themeColor leading-none">Some Of Similar Products</h2>
+              <div className="flex space-x-2">
+                <button onClick={prevSlide} className="group p-2 border border-gray-300 rounded-lg hover:bg-themeColor transition-colors">
+                  <ChevronLeft className="w-5 h-5 group-hover:text-white" />
+                </button>
+                <button onClick={nextSlide} className="group p-2 border border-gray-300 rounded-lg hover:bg-themeColor transition-colors">
+                  <ChevronRight className="w-5 h-5 group-hover:text-white" />
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="overflow-hidden">
-            <div className="flex transition-transform duration-300 ease-in-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-              {relatedProducts.map((product) => (
-                <div key={product.id} className="w-1/4 flex-shrink-0 px-3">
-                  <div className="bg-white rounded-lg overflow-hidden group shadow-lg transition-shadow">
-                    <div className="relative">
-                      {product.discount > 0 && (
-                        <div
-                          className="absolute top-0 right-0 w-[150px] h-[35px] bg-no-repeat bg-cover text-white text-font-17 font-bold flex items-center justify-end pr-6 pt-1"
-                          style={{ backgroundImage: `url(${redRibbon})` }}
+            <div className="overflow-hidden">
+              <div className="flex transition-transform duration-300 ease-in-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+                {relatedProducts.map((product) => (
+                  <div key={`related-${product.id || product.barcode}`} className="w-1/4 flex-shrink-0 px-3">
+                    <div className="bg-white rounded-lg overflow-hidden group shadow-lg transition-shadow">
+                      <div className="relative">
+                        {product.discount > 0 && (
+                          <div
+                            className="absolute top-0 right-0 w-[150px] h-[35px] bg-no-repeat bg-cover text-white text-font-17 font-bold flex items-center justify-end pr-6 pt-1"
+                            style={{ backgroundImage: `url(${redRibbon})` }}
+                          >
+                            {product.discount.toFixed(0)} tk Off
+                          </div>
+                        )}
+
+                        {/* <img src={product.images?.[0] || notFoundImage} alt="Product Image" className="w-full h-48 object-cover" /> */}
+                        <img src={notFoundImage} alt="Product Image" className="w-full h-48 object-cover" />
+                      </div>
+
+                      <div className="p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">{product.unitType?.shortform === "pc" ? "Piece" : "Kilogram"}</span>
+                        </div>
+                        <h3
+                          onClick={() => moveToProductDetails(product)}
+                          className="card-title text-textColor hover:text-themeColor text-base font-bold mt-2 min-h-[48px] line-clamp-2 leading-6 cursor-pointer"
                         >
-                          {product.discount.toFixed(0)} tk Off
-                        </div>
-                      )}
+                          {product.name
+                            ?.split(" ")
+                            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(" ")}
+                        </h3>
 
-                      <img
-                        // src={product.images && product.images[0] ? product.images[0] : notFoundImage}
-                        src={notFoundImage}
-                        alt="Product Image swiper-lazy"
-                        className="w-full h-48 object-cover"
-                      />
-                    </div>
-
-                    <div className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">
-                        {product.unitType && product.unitType.shortform === "pc" ? "Piece" : "Kilogram"}
-                      </span>
-                    </div>
-                      <h3
-                        onClick={() => moveToProductDetails(product)}
-                        className="card-title text-textColor hover:text-themeColor text-base font-bold mt-2 min-h-[48px] line-clamp-2 leading-6 cursor-pointer"
-                      >
-                        {product.name
-                          .split(" ")
-                          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                          .join(" ")}
-                      </h3>
-
-                      {product.discount > 0 ? (
-                        <div className="flex justify-start gap-3 items-center pt-2">
-                          <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {(product.price.sell - product.discount).toFixed(2)}</div>
-                          <del className="text-gray-400 text-sm leading-normal">Tk. {product.price.sell.toFixed(2)}</del>
-                        </div>
-                      ) : (
-                        <div className="flex justify-start gap-2 items-center pt-2">
-                          <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {product.price.sell.toFixed(2)}</div>
-                        </div>
-                      )}
-                      <button className="w-full bg-themeColor text-white text-sm font-medium py-2 mt-4 rounded hover:bg-[#41b899]">
-                        <i className="fas fa-shopping-basket"></i> Add To Cart
-                      </button>
+                        {product.discount > 0 ? (
+                          <div className="flex justify-start gap-3 items-center pt-2">
+                            <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {(product.price.sell - product.discount).toFixed(2)}</div>
+                            <del className="text-gray-400 text-sm leading-normal">Tk. {product.price.sell.toFixed(2)}</del>
+                          </div>
+                        ) : (
+                          <div className="flex justify-start gap-2 items-center pt-2">
+                            <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {product.price.sell.toFixed(2)}</div>
+                          </div>
+                        )}
+                        <button className="w-full bg-themeColor text-white text-sm font-medium py-2 mt-4 rounded hover:bg-[#41b899]">
+                          <i className="fas fa-shopping-basket"></i> Add To Cart
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

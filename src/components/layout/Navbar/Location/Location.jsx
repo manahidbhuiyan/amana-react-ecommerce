@@ -1,6 +1,6 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchBranches, setSelectedArea, setBranchId } from "../../../../features/locations/locationSlice";
+import { fetchBranches, setSelectedArea, setBranchId, setSelectedBranch } from "../../../../features/locations/locationSlice";
 import { Dialog } from "@headlessui/react";
 import LocationDetails from "./LocationDetails";
 
@@ -9,19 +9,30 @@ const Location = forwardRef((props, ref) => {
   const dispatch = useDispatch();
   const { branches, isLoading, isError, selectedArea } = useSelector((state) => state.location);
 
-  useEffect(() => {
-    dispatch(fetchBranches());
+useEffect(() => {
+  dispatch(fetchBranches());
 
-    if (!selectedArea) {
-      const storedArea = localStorage.getItem("selectedArea");
-      const storedBranchId = localStorage.getItem("branchId");
+  if (!selectedArea) {
+    const storedArea = localStorage.getItem("selectedArea");
+    const storedBranchString = localStorage.getItem("selectedBranch");
+    const storedBranchId = localStorage.getItem("branchId");
 
-      if (storedArea && storedBranchId) {
-        dispatch(setSelectedArea(storedArea));
-        dispatch(setBranchId(storedBranchId));
+    if (storedArea && storedBranchId) {
+      dispatch(setSelectedArea(storedArea));
+      dispatch(setBranchId(storedBranchId));
+      
+      // Parse JSON string back to object
+      if (storedBranchString) {
+        try {
+          const storedBranch = JSON.parse(storedBranchString); // ✅ JSON parse করো
+          dispatch(setSelectedBranch(storedBranch));
+        } catch (error) {
+          console.error("Error parsing stored branch:", error);
+        }
       }
     }
-  }, [selectedArea]);
+  }
+}, [selectedArea, dispatch]);
   // }, [dispatch, selectedArea]);
 
   // Add this to expose the open method

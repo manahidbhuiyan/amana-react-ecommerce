@@ -19,7 +19,6 @@ export const loadProductData = createAsyncThunk("products/loadProductData", asyn
 
 export const loadProductSingleData = createAsyncThunk("products/singleProductData", async ({ slug, branchId, barcode }) => {
   const singleProduct = await getSingleProduct(slug, branchId, barcode);
-  console.log("singleProduct",singleProduct)
   return singleProduct ;
 });
 

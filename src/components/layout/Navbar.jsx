@@ -41,7 +41,7 @@ const Navbar = () => {
 
   return (
     <div>
-      <div className="bg-sectionBackground">
+      <div className="bg-sectionBackgroundLight">
         {/* Header Bottom */}
         <div className="header-bottom z-50 px-4 py-0">
           <div className="flex items-center justify-between lg:gap-5 py-2">
@@ -49,7 +49,7 @@ const Navbar = () => {
             <div className="header-left flex items-center w-1/5">
               <div className="header-bottom-col logo flex justify-start w-[100px] 2md:logo-[185px] lg:w-[200px] ">
                 <div className="logo-inner w-[85px] ml-0 2md:mx-auto 2md:w-[130px]">
-                  <img onClick={() => navigate("/", { replace: true })} src={logo} alt="Amana Big Bazar" className="img-fluid" />
+                  <img onClick={() => navigate("/", { replace: true })} src={logo} alt="Amana Big Bazar" className="img-fluid cursor-pointer" />
                 </div>
               </div>
             </div>
