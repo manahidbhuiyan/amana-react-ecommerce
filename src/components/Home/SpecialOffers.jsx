@@ -52,6 +52,11 @@ const SpecialOffers = () => {
     navigate(`/product/${product.category.name}/${product.subcategory.name}/${product.slug}/${product.barcode}`);
   };
 
+  const goProductList = () =>{
+    const specialOfferCondition = true 
+    navigate(`/product?specialOffer=${encodeURIComponent(specialOfferCondition)}`);
+  }
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-40">
@@ -66,10 +71,10 @@ const SpecialOffers = () => {
         <div className="sec-header flex items-center justify-between mb-4">
           <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold mb-1 ">Special Products</h2>
           <div className="flex space-x-2">
-            <button className="prev-new-product carousel-nav bg-gray-300 text-themeColor w-8 h-8 flex items-center justify-center rounded-full hover:bg-themeColor hover:text-white">
+            <button className="prev-special-offer carousel-nav bg-gray-300 text-themeColor w-8 h-8 flex items-center justify-center rounded-full hover:bg-themeColor hover:text-white">
               <i className="fas fa-angle-left"></i>
             </button>
-            <button className="next-new-product carousel-nav bg-gray-300 text-themeColor w-8 h-8 flex items-center justify-center rounded-full hover:bg-themeColor hover:text-white">
+            <button className="next-special-offer carousel-nav bg-gray-300 text-themeColor w-8 h-8 flex items-center justify-center rounded-full hover:bg-themeColor hover:text-white">
               <i className="fas fa-angle-right"></i>
             </button>
           </div>
@@ -160,7 +165,7 @@ const SpecialOffers = () => {
                 </div>
               </SwiperSlide>
             ))}
-          <SwiperSlide key="load-more-card">
+          <SwiperSlide key="load-more-card" onClick={() => goProductList()}>
             <ProductLoadCard />
           </SwiperSlide>
         </Swiper>
