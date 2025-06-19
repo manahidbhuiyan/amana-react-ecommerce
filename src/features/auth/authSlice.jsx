@@ -83,32 +83,9 @@ const authSlice = createSlice({
         state.isError = true;
         state.error = action.payload;
       });
-
-    // builder
-    //   // Add these new cases for loadUser
-    //   .addCase(logOutUser.pending, (state) => {
-    //     state.isLoading = true;
-    //     state.isError = false;
-    //     state.error = "";
-    //   })
-    //   .addCase(logOutUser.fulfilled, (state, action) => {
-    //     state.isLoading = false;
-    //     state.user = null
-    //     state.token = null
-    //     state.userInformation = null
-    //     if (!action.payload?.token) {
-    //       localStorage.removeItem("userToken");
-    //     }
-    //   })
-    //   .addCase(logOutUser.rejected, (state, action) => {
-    //     state.isLoading = false;
-    //     state.isError = true;
-    //     state.error = action.payload;
-    //   });
   },
 });
 
-// Export actions
-export const { setSelectedArea, logOutUser } = authSlice.actions; // Updated to include logOutUser, removed setBranchId which wasn't defined
+export const { setSelectedArea, logOutUser } = authSlice.actions; 
 
 export default authSlice.reducer;

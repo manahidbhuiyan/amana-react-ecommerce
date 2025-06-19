@@ -51,9 +51,8 @@ const NewProducts = () => {
   };
 
   const goProductList = () => {
-    console.log("clicked");
     const newProductCondition = true;
-    navigate(`/product?newProduct=${encodeURIComponent(newProductCondition)}`);
+    navigate(`/products/list/search/?newProduct=${encodeURIComponent(newProductCondition)}`);
   };
 
   if (loading) {

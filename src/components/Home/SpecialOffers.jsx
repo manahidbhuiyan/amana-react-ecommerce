@@ -54,7 +54,7 @@ const SpecialOffers = () => {
 
   const goProductList = () =>{
     const specialOfferCondition = true 
-    navigate(`/product?specialOffer=${encodeURIComponent(specialOfferCondition)}`);
+    navigate(`/products/list/search/?specialOffer=${encodeURIComponent(specialOfferCondition)}`);
   }
 
   if (loading) {

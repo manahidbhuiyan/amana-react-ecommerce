@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import Hero from "../../components/Home/Hero";
 import NewProducts from "../../components/Home/NewProducts";
 import SpecialOffers from "../../components/Home/SpecialOffers";
+import Catrgories from "../../components/Home/AllCategories";
 import Location from "../../components/layout/Navbar/Location/Location";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -38,6 +39,7 @@ const Home = () => {
           <Hero />
           <SpecialOffers />
           <NewProducts />
+          <Catrgories />
         </>
       ) : (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">

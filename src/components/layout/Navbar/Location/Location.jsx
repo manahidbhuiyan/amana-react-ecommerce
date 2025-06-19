@@ -9,30 +9,30 @@ const Location = forwardRef((props, ref) => {
   const dispatch = useDispatch();
   const { branches, isLoading, isError, selectedArea } = useSelector((state) => state.location);
 
-useEffect(() => {
-  dispatch(fetchBranches());
+  useEffect(() => {
+    dispatch(fetchBranches());
 
-  if (!selectedArea) {
-    const storedArea = localStorage.getItem("selectedArea");
-    const storedBranchString = localStorage.getItem("selectedBranch");
-    const storedBranchId = localStorage.getItem("branchId");
+    if (!selectedArea) {
+      const storedArea = localStorage.getItem("selectedArea");
+      const storedBranchString = localStorage.getItem("selectedBranch");
+      const storedBranchId = localStorage.getItem("branchId");
 
-    if (storedArea && storedBranchId) {
-      dispatch(setSelectedArea(storedArea));
-      dispatch(setBranchId(storedBranchId));
-      
-      // Parse JSON string back to object
-      if (storedBranchString) {
-        try {
-          const storedBranch = JSON.parse(storedBranchString); // ✅ JSON parse করো
-          dispatch(setSelectedBranch(storedBranch));
-        } catch (error) {
-          console.error("Error parsing stored branch:", error);
+      if (storedArea && storedBranchId) {
+        dispatch(setSelectedArea(storedArea));
+        dispatch(setBranchId(storedBranchId));
+
+        // Parse JSON string back to object
+        if (storedBranchString) {
+          try {
+            const storedBranch = JSON.parse(storedBranchString); // ✅ JSON parse করো
+            dispatch(setSelectedBranch(storedBranch));
+          } catch (error) {
+            console.error("Error parsing stored branch:", error);
+          }
         }
       }
     }
-  }
-}, [selectedArea, dispatch]);
+  }, [selectedArea, dispatch]);
   // }, [dispatch, selectedArea]);
 
   // Add this to expose the open method
@@ -47,36 +47,25 @@ useEffect(() => {
   return (
     <div>
       <div onClick={() => setIsOpen(true)} className="cursor-pointer ">
-        {isLoading && <p>Loading...</p>}
-        {isError && <p className="pb-1">Something wrong!</p>}
-
-        <p className="text-themeColor text-font-17 flex items-center">
-          {selectedArea ? (
-            <>
-              <i className="fas fa-map-marker-alt mr-1 text-[15px] mt-[-2px] "></i>
-              {selectedArea
-                .split(" ")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(" ")}
-            </>
-          ) : (
-            "No area selected"
-          )}
-        </p>
-
-        {/* {branches.length > 0 ? (
-          branches.map((branch, index) => (
-            <button key={index} className="mr-2 text-capitalize small-device-branch branch-change">
-              <span className="text text-themeColor ">
-                <i className="fas fa-map-marker-alt mr-2 "></i>
-                <i class="fa-solid fa-location-dot"></i>
-                {branch.name}
-              </span>
-            </button>
-          ))
+        {isLoading ? (
+          <p className="p-0">Loading...</p>
+        ) : isError ? (
+          <p className="p-0">Something wrong!</p>
         ) : (
-          <p>{selectedArea ? selectedArea : "No area select"}</p>
-        )} */}
+          <p className="text-themeColor text-font-17 flex items-center">
+            {selectedArea ? (
+              <>
+                <i className="fas fa-map-marker-alt mr-1 text-[15px] mt-[-2px] "></i>
+                {selectedArea
+                  .split(" ")
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(" ")}
+              </>
+            ) : (
+              "No area selected"
+            )}
+          </p>
+        )}
       </div>
       <Dialog
         open={isOpen}

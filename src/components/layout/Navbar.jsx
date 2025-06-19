@@ -36,7 +36,7 @@ const Navbar = () => {
     dispatch(logOutUser());
     setIsLoggedIn(false);
     setDropdownOpen(false);
-    navigate("/", { replace: true });
+    navigate("/signin", { replace: true });
   };
 
   return (
@@ -79,7 +79,7 @@ const Navbar = () => {
                       ) : (
                         <div className="pro-pic w-[35px] h-[35px] rounded-full bg-white text-center leading-[35px] shadow-[0_0_10px_2px_rgba(0,0,0,.08)]">
                           {/* Show profile picture if logged in */}
-                          {userInformation.info.avatar ? (
+                          {userInformation.info?.avatar ? (
                             <img src={userInformation.info.avatar} alt="profile-pic" className="img-fluid rounded-full" />
                           ) : (
                             <img src={profile_image} alt="profile-pic" className="img-fluid rounded-full" />
@@ -158,7 +158,6 @@ const Navbar = () => {
               All Categories <i className="fas fa-list pl-2"></i>
             </button>
           </div>
-          {/* <div className="offers pl-4 hidden sm:flex">Add offers here</div> */}
           {/* Special Product Show for Large Devices */}
           <div className="bg-themeColor h-[36px] flex justify-between p-0 border-[3px] border-sectionBackground rounded-[14px] cursor-pointer align-middle items-center font-times shadow-[0px_0px_5px_0px_#41b883]">
             <button className="offer-btn bg-sectionBackground font-bold border-0 py-[6px] px-[8px] rounded-[10px] text-themeColor text-font-14 tracking-[1px]">OFFERS</button>

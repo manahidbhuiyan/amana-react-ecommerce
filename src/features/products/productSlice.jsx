@@ -4,6 +4,7 @@ import { getProducts, getSingleProduct } from "./productApi";
 const initialState = {
   newProducts: [],
   specialOffers: [],
+  productList: [],
   singleProduct: null,
   isLoading: false,
   isError: false,
@@ -19,7 +20,7 @@ export const loadProductData = createAsyncThunk("products/loadProductData", asyn
 
 export const loadProductSingleData = createAsyncThunk("products/singleProductData", async ({ slug, branchId, barcode }) => {
   const singleProduct = await getSingleProduct(slug, branchId, barcode);
-  return singleProduct ;
+  return singleProduct;
 });
 
 const productSlice = createSlice({
@@ -57,6 +58,8 @@ const productSlice = createSlice({
           state.newProducts = action.payload.products;
         } else if (action.payload.queryType === "specialOffer") {
           state.specialOffers = action.payload.products;
+        } else {
+          state.productList = action.payload.products;
         }
       })
       .addCase(loadProductData.rejected, (state, action) => {
@@ -71,7 +74,7 @@ const productSlice = createSlice({
       })
       .addCase(loadProductSingleData.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.singleProduct = action.payload
+        state.singleProduct = action.payload;
       })
       .addCase(loadProductSingleData.rejected, (state, action) => {
         state.isLoading = false;
