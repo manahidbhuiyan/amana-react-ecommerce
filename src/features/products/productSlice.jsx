@@ -5,6 +5,7 @@ const initialState = {
   newProducts: [],
   specialOffers: [],
   productList: [],
+  productInformation: [],
   singleProduct: null,
   isLoading: false,
   isError: false,
@@ -36,7 +37,9 @@ const productSlice = createSlice({
     setSingleProduct(state, action) {
       state.singleProduct = action.payload;
     },
-    // Loading state manually control করার জন্য
+    pushProductInformation: (state, action) => {
+      state.productList.push(...action.payload);
+    },
     setLoading(state, action) {
       state.isLoading = action.payload;
     },
@@ -47,7 +50,6 @@ const productSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Multiple products loading
       .addCase(loadProductData.pending, (state) => {
         state.isLoading = true;
         state.isError = false;
@@ -84,5 +86,5 @@ const productSlice = createSlice({
   },
 });
 
-export const { setNewProducts, setSpecialOffers, setSingleProduct, setLoading, clearError } = productSlice.actions;
+export const { setNewProducts, setSpecialOffers, setSingleProduct, pushProductInformation, setLoading, clearError } = productSlice.actions;
 export default productSlice.reducer;

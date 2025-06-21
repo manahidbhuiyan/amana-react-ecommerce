@@ -1,31 +1,64 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import notFoundImage from "../../assets/images/products/no-image.jpg";
 import { useSelector, useDispatch } from "react-redux";
 import redRibbon from "../../assets/images/red-ribbon.png";
-import { loadProductData } from "../../features/products/productSlice";
+import { loadProductData, pushProductInformation } from "../../features/products/productSlice";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 const Product = () => {
   const { search } = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  let page = useRef(2);
+  const [hasMore, setHasMore] = useState(true);
 
   const queryParams = Object.fromEntries(new URLSearchParams(search));
 
+  const { productList } = useSelector((state) => state.products);
+  console.log("productList", productList);
+  const products = productList?.data || productList || [];
+  console.log("products", products);
+
   useEffect(() => {
+    setHasMore(true);
     let queryString = queryParams;
     let branchId = localStorage.branchId;
-    console.log("queryString",queryString)
-
     dispatch(loadProductData({ pageNo: 1, branchId, queryString }));
-  }, [dispatch]);
+  }, [dispatch, search]);
 
-  const { productList, isLoading, isError } = useSelector((state) => state.products);
-  // Safe check করুন
-  const products = productList?.data || productList || [];
-  console.log("productList", productList);
-  console.log("products", products);
+  const infinateHandler = useCallback(async () => {
+    {
+      let queryString = queryParams;
+      let branchId = localStorage.branchId;
+      try {
+        const result = await dispatch(
+          loadProductData({
+            pageNo: page,
+            branchId: branchId,
+            queryString,
+          })
+        );
+
+        if (result.payload && result.payload.data && result.payload.data.data) {
+          const newProducts = result.payload.data.data.filter((obj) => obj.quantity >= 1);
+
+          if (newProducts.length > 0) {
+            dispatch(pushProductInformation(newProducts));
+            page++;
+          } else {
+            setHasMore(false);
+          }
+        }
+
+        console.log("result", result);
+      } catch (error) {
+        console.error("Error loading products:", error);
+        setHasMore(false);
+      }
+    }
+  }, [dispatch, search]);
 
   const moveToProductDetails = (product) => {
     navigate(`/product/${product.category.name}/${product.subcategory.name}/${product.slug}/${product.barcode}`);
@@ -85,9 +118,19 @@ const Product = () => {
             );
           })
         ) : (
-          <div className="col-span-full text-center py-8">
-            <p className="text-lg text-gray-500">No products found</p>
-          </div>
+          <InfiniteScroll
+            dataLength={products.length}
+            next={infinateHandler}
+            hasMore={hasMore}
+            loader={<div className="text-center py-4">Loading more products...</div>}
+            endMessage={
+              <p style={{ textAlign: "center" }}>
+                <b>No more product found!</b>
+              </p>
+            }
+          >
+            /
+          </InfiniteScroll>
         )}
       </div>
     </div>

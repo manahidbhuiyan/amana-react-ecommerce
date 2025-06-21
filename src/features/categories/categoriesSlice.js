@@ -13,7 +13,6 @@ const initialState = {
 // New products and Special offers
 export const loadCategoryData = createAsyncThunk("categories/loadCategoryData", async ({ branchId }) => {
     const CategoriesData = await getCategoryData(branchId);
-    console.log(CategoriesData)
     return CategoriesData.info;
 });
 

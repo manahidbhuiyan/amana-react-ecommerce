@@ -4,7 +4,6 @@ export const getCategoryData = async (branchID) => {
     try {
         let requestLink = '/api/category/branch/' + branchID
         const res = await axios.get(requestLink);
-        console.log("res",res)
         return res.data;
     } catch (error) {
         throw error;

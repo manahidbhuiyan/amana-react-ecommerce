@@ -12,8 +12,6 @@ const AllCategories = () => {
   const { CategoriesData, isLoading, isError } = useSelector((state) => state.categories);
   const topCategories = CategoriesData;
 
-  console.log("CategoriesData", CategoriesData);
-
   // Fetch categories on component mount
   useEffect(() => {
     let branchId = localStorage.branchId;
@@ -27,8 +25,8 @@ const AllCategories = () => {
   };
 
   return (
-    <div className="pt-16 px-4 max-w-7xl mx-auto">
-      <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center capitalize text-gray-800">Top Categories</h2>
+    <div className="py-10">
+      <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold text-center mb-5">All Categories</h2>
 
       {/* Error State */}
       {isError && !isLoading && (
