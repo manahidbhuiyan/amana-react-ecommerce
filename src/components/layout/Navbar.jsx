@@ -14,6 +14,8 @@ const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const { userInformation, token } = useSelector((state) => state.auth);
+  const { specialOffers } = useSelector((state) => state.products);
+  const specialOfferCount = specialOffers.count;
 
   useEffect(() => {
     if (token && !userInformation) {
@@ -30,8 +32,12 @@ const Navbar = () => {
     }
   }, [userInformation]);
 
-  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+  const goProductList = () => {
+    const specialOfferCondition = true;
+    navigate(`/products/list/search/?specialOffer=${encodeURIComponent(specialOfferCondition)}`);
+  };
 
+  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
   const handleSignOut = () => {
     dispatch(logOutUser());
     setIsLoggedIn(false);
@@ -159,9 +165,12 @@ const Navbar = () => {
             </button>
           </div>
           {/* Special Product Show for Large Devices */}
-          <div className="bg-themeColor h-[36px] flex justify-between p-0 border-[3px] border-sectionBackground rounded-[14px] cursor-pointer align-middle items-center font-times shadow-[0px_0px_5px_0px_#41b883]">
+          <div
+            className="bg-themeColor h-[36px] flex justify-between p-0 border-[3px] border-sectionBackground rounded-[14px] cursor-pointer align-middle items-center font-times shadow-[0px_0px_5px_0px_#41b883]"
+            onClick={() => goProductList()}
+          >
             <button className="offer-btn bg-sectionBackground font-bold border-0 py-[6px] px-[8px] rounded-[10px] text-themeColor text-font-14 tracking-[1px]">OFFERS</button>
-            <p className="offer-text px-[6px] text-[20px] font-bold text-[#F8FAFC] leading-[1.3] self-center">99+</p>
+            <p className="offer-text px-[6px] text-[20px] font-bold text-[#F8FAFC] leading-[1.3] self-center"> {specialOfferCount} +</p>
           </div>
         </div>
       </div>

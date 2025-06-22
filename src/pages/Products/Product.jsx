@@ -17,9 +17,7 @@ const Product = () => {
   const queryParams = Object.fromEntries(new URLSearchParams(search));
 
   const { productList } = useSelector((state) => state.products);
-  console.log("productList", productList);
   const products = productList?.data || productList || [];
-  console.log("products", products);
 
   useEffect(() => {
     setHasMore(true);
@@ -52,7 +50,6 @@ const Product = () => {
           }
         }
 
-        console.log("result", result);
       } catch (error) {
         console.error("Error loading products:", error);
         setHasMore(false);
