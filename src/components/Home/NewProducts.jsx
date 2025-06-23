@@ -4,6 +4,7 @@ import notFoundImage from "../../assets/images/products/no-image.jpg";
 import { loadProductData } from "../../features/products/productSlice";
 import ProductLoadCard from "../common/ProductLoadCard";
 import { useNavigate } from "react-router-dom";
+import { getImageUrl } from "../../utilis/api";
 
 // swiper
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -122,7 +123,7 @@ const NewProducts = () => {
                     )}
 
                     <img
-                      src={product.images && product.images[0] ? product.images[0] : notFoundImage}
+                      src={product.images && product.images[0] ? getImageUrl(product.images[0]) : notFoundImage}
                       // src={notFoundImage}
                       alt="Product Image swiper-lazy"
                       className="w-full h-48 object-cover"

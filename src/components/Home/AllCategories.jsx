@@ -3,6 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { loadCategoryData } from "../../features/categories/categoriesSlice";
 import "./AllCategories.css";
+import { getImageUrl } from "../../utilis/api";
+
 
 const AllCategories = () => {
   const dispatch = useDispatch();
@@ -52,7 +54,7 @@ const AllCategories = () => {
           {topCategories.map((categoryData, index) => (
             <div key={index} className="col-span-1 sm:col-span-1 md:col-span-1 xl:col-span-1 px-1 mb-2" onClick={() => redirectToProducts(categoryData.category.slug)}>
               <div className="bg-white rounded-lg shadow cursor-pointer">
-                <img src={categoryData.category.cover} alt="top category name" className="w-full h-auto object-cover" />
+                <img src={getImageUrl(categoryData.category.cover)} alt="top category name" className="w-full h-auto object-cover" />
                 <div className="p-2 flex justify-between">
                   <div className="capitalize text-[17px] font-bold text-black">{categoryData.category.name.slice(0, 20)}</div>
                 </div>

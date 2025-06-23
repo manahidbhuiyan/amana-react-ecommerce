@@ -5,6 +5,7 @@ import redRibbon from "../../assets/images/red-ribbon.png";
 import { loadProductData } from "../../features/products/productSlice";
 import ProductLoadCard from "../common/ProductLoadCard";
 import { useNavigate } from "react-router-dom";
+import { getImageUrl } from "../../utilis/api";
 
 // swiper
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -126,8 +127,8 @@ const SpecialOffers = () => {
                     )}
 
                     <img
-                      // src={product.images && product.images[0] ? product.images[0] : notFoundImage}
-                      src={notFoundImage}
+                      src={product.images && product.images[0] ? getImageUrl(product.images[0]) : notFoundImage}
+                      // src={notFoundImage}
                       alt="Product Image swiper-lazy"
                       className="w-full h-48 object-cover"
                     />

@@ -3,6 +3,8 @@ import locationReducer from '../features/locations/locationSlice'
 import productReducer from "../features/products/productSlice";
 import authReducer from "../features/auth/authSlice"
 import categoriesReducer from '../features/categories/categoriesSlice';
+import heroReducer from "../features//slice/heroSlice"
+import customerReviewReducer from '../features/slice/customerReviewSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,5 +12,7 @@ export const store = configureStore({
     location: locationReducer,
     products: productReducer,
     categories: categoriesReducer,
+    hero: heroReducer,
+    customerReview: customerReviewReducer,
   }, // Reducer gula ekhane add korte hobe
 });
