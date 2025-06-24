@@ -23,33 +23,44 @@ const Product = () => {
     setHasMore(true);
     let queryString = queryParams;
     let branchId = localStorage.branchId;
-    dispatch(loadProductData({ pageNo: 1, branchId, queryString }));
+    if (productList?.data.length < 30) {
+      console.log("------------------------------- `1");
+      dispatch(loadProductData({ pageNo: 1, branchId, queryString }));
+    }
   }, [dispatch, search]);
 
   const infinateHandler = useCallback(async () => {
+    console.log("Total Products init", productList);
+
     {
       let queryString = queryParams;
       let branchId = localStorage.branchId;
       try {
+        console.log("page before", page.current);
         const result = await dispatch(
           loadProductData({
-            pageNo: page,
+            pageNo: page.current,
             branchId: branchId,
             queryString,
           })
         );
 
-        if (result.payload && result.payload.data && result.payload.data.data) {
-          const newProducts = result.payload.data.data.filter((obj) => obj.quantity >= 1);
+        console.log("result", result);
 
+        if (result.payload && result.payload.products && result.payload.products.data) {
+          const newProducts = result.payload.products.data.filter((obj) => obj.quantity >= 1);
           if (newProducts.length > 0) {
-            dispatch(pushProductInformation(newProducts));
-            page++;
+          console.log("newProducts", newProducts.length)
+            console.log("------------------------------- `2");
+
+            // dispatch(pushProductInformation(newProducts));
+            page.current++;
+            console.log("page after", page.current);
+            console.log("Total Products", productList);
           } else {
             setHasMore(false);
           }
         }
-
       } catch (error) {
         console.error("Error loading products:", error);
         setHasMore(false);
@@ -63,72 +74,73 @@ const Product = () => {
 
   return (
     <div className="container mx-auto px-2 py-4">
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 lg:gap-7">
-        {products.length > 0 ? (
-          products.map((product, index) => {
-            return (
-              <div key={product._id || index} className={`card product-card bg-white shadow-lg rounded-lg overflow-hidden h-[400px]`}>
-                <div className="relative">
-                  {product.discount > 0 && (
-                    <div
-                      className="absolute top-0 right-0 w-[150px] h-[35px] bg-no-repeat bg-cover text-white text-font-17 font-bold flex items-center justify-end pr-6 pt-1"
-                      style={{ backgroundImage: `url(${redRibbon})` }}
-                    >
-                      {product.discount.toFixed(0)} tk Off
-                    </div>
-                  )}
-
-                  <img src={notFoundImage} alt="Product Image" className="w-full h-48 object-cover" />
-                </div>
-
-                <div className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">{product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}</span>
-                  </div>
-
-                  <h3
-                    onClick={() => moveToProductDetails(product)}
-                    className="card-title text-textColor hover:text-themeColor text-base font-bold mt-2 min-h-[48px] line-clamp-2 leading-6 cursor-pointer"
+      <div className="bg-gray-300 py-10 px-5 fixed top-32 z-50">
+        <p>Total Products : {productList.count} </p>
+        <p>Products Loaded : {products.length} </p>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-10 gap-3 lg:gap-7">
+        {products.map((product, index) => {
+          return (
+            <div key={product._id || index} className={`card product-card bg-white shadow-lg rounded-lg overflow-hidden h-[400px]`}>
+              <div className="relative">
+                {product.discount > 0 && (
+                  <div
+                    className="absolute top-0 right-0 w-[150px] h-[35px] bg-no-repeat bg-cover text-white text-font-17 font-bold flex items-center justify-end pr-6 pt-1"
+                    style={{ backgroundImage: `url(${redRibbon})` }}
                   >
-                    {product.name
-                      .split(" ")
-                      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                      .join(" ")}
-                  </h3>
+                    {product.discount.toFixed(0)} tk Off
+                  </div>
+                )}
 
-                  {product.discount > 0 ? (
-                    <div className="flex justify-start gap-3 items-center pt-2">
-                      <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {(product.price.sell - product.discount).toFixed(2)}</div>
-                      <del className="text-gray-400 text-sm leading-normal">Tk. {product.price.sell.toFixed(2)}</del>
-                    </div>
-                  ) : (
-                    <div className="flex justify-start gap-2 items-center pt-2">
-                      <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {product.price.sell.toFixed(2)}</div>
-                    </div>
-                  )}
-
-                  <button className="w-full bg-themeColor text-white text-sm font-medium py-2 mt-4 rounded hover:bg-[#41b899]">
-                    <i className="fas fa-shopping-basket"></i> Add To Cart
-                  </button>
-                </div>
+                <img src={notFoundImage} alt="Product Image" className="w-full h-48 object-cover" />
               </div>
-            );
-          })
-        ) : (
-          <InfiniteScroll
-            dataLength={products.length}
-            next={infinateHandler}
-            hasMore={hasMore}
-            loader={<div className="text-center py-4">Loading more products...</div>}
-            endMessage={
-              <p style={{ textAlign: "center" }}>
-                <b>No more product found!</b>
-              </p>
-            }
-          >
-            /
-          </InfiniteScroll>
-        )}
+
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">{product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}</span>
+                </div>
+
+                <h3
+                  onClick={() => moveToProductDetails(product)}
+                  className="card-title text-textColor hover:text-themeColor text-base font-bold mt-2 min-h-[48px] line-clamp-2 leading-6 cursor-pointer"
+                >
+                  {product.name
+                    .split(" ")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ")}
+                </h3>
+
+                {product.discount > 0 ? (
+                  <div className="flex justify-start gap-3 items-center pt-2">
+                    <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {(product.price.sell - product.discount).toFixed(2)}</div>
+                    <del className="text-gray-400 text-sm leading-normal">Tk. {product.price.sell.toFixed(2)}</del>
+                  </div>
+                ) : (
+                  <div className="flex justify-start gap-2 items-center pt-2">
+                    <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {product.price.sell.toFixed(2)}</div>
+                  </div>
+                )}
+
+                <button className="w-full bg-themeColor text-white text-sm font-medium py-2 mt-4 rounded hover:bg-[#41b899]">
+                  <i className="fas fa-shopping-basket"></i> Add To Cart
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div>
+        <InfiniteScroll
+          dataLength={products.length}
+          next={infinateHandler}
+          hasMore={hasMore}
+          loader={<div className="text-center py-4">Loading more products...</div>}
+          endMessage={
+            <p style={{ textAlign: "center" }}>
+              <b>No more product found!</b>
+            </p>
+          }
+        ></InfiniteScroll>
       </div>
     </div>
   );

@@ -4,7 +4,10 @@ import { getProducts, getSingleProduct } from "./productApi";
 const initialState = {
   newProducts: [],
   specialOffers: [],
-  productList: [],
+  productList: {
+    data: [],
+    count: 0,
+  },
   productInformation: [],
   singleProduct: null,
   isLoading: false,
@@ -16,7 +19,7 @@ const initialState = {
 // New products and Special offers
 export const loadProductData = createAsyncThunk("products/loadProductData", async ({ pageNo, branchId, queryString, queryType }) => {
   const products = await getProducts(pageNo, branchId, queryString);
-  return { products, queryType };
+  return { products, queryType, pageNo };
 });
 
 export const loadProductSingleData = createAsyncThunk("products/singleProductData", async ({ slug, branchId, barcode }) => {
@@ -38,7 +41,18 @@ const productSlice = createSlice({
       state.singleProduct = action.payload;
     },
     pushProductInformation: (state, action) => {
-      state.productList.push(...action.payload);
+      // Properly append new products to existing data array
+      if (state.productList.data) {
+        state.productList.data.push(...action.payload);
+      } else {
+        state.productList.data = action.payload;
+      }
+    },
+    clearProductList: (state) => {
+      state.productList = {
+        data: [],
+        count: 0,
+      };
     },
     setLoading(state, action) {
       state.isLoading = action.payload;
@@ -61,7 +75,23 @@ const productSlice = createSlice({
         } else if (action.payload.queryType === "specialOffer") {
           state.specialOffers = action.payload.products;
         } else {
-          state.productList = action.payload.products;
+          // For the first page, replace the data
+          if (action.payload.pageNo === 1) {
+            state.productList = {
+              data: action.payload.products.data || action.payload.products,
+              count: action.payload.products.count || 0,
+            };
+          } else {
+            // For subsequent pages, append new products to existing data
+            const newProducts = action.payload.products.data || action.payload.products;
+            if (state.productList.data && newProducts) {
+              state.productList.data.push(...newProducts);
+            }
+            // Update count if provided
+            if (action.payload.products.count !== undefined) {
+              state.productList.count = action.payload.products.count;
+            }
+          }
         }
       })
       .addCase(loadProductData.rejected, (state, action) => {
@@ -86,5 +116,6 @@ const productSlice = createSlice({
   },
 });
 
-export const { setNewProducts, setSpecialOffers, setSingleProduct, pushProductInformation, setLoading, clearError } = productSlice.actions;
+export const { setNewProducts, setSpecialOffers, setSingleProduct, pushProductInformation, clearProductList, setLoading, clearError } = productSlice.actions;
+
 export default productSlice.reducer;
