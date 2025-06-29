@@ -3,9 +3,11 @@ import logo from "../../assets/images/logo-beta.png";
 import profile_image from "../../assets/images/fox.jpg";
 import SearchBar from "./Navbar/SearchBar/SearchBar";
 import Location from "./Navbar/Location/Location";
+import Cart from "../common/Cart";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loadUser, logOutUser } from "../../features/auth/authSlice";
+import { toggleSidebar, resetSidebarSelections } from "../../features/slice/sidebarSlice";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -26,7 +28,7 @@ const Navbar = () => {
   useEffect(() => {
     if (userInformation && Object.keys(userInformation).length > 0) {
       setIsLoggedIn(true);
-      navigate("/", { replace: true });
+      // navigate("/", { replace: true });
     } else {
       setIsLoggedIn(false);
     }
@@ -45,6 +47,17 @@ const Navbar = () => {
     navigate("/signin", { replace: true });
   };
 
+  // Handle logo click - reset sidebar selections and navigate home
+  const handleLogoClick = () => {
+    dispatch(resetSidebarSelections());
+    navigate("/", { replace: true });
+  };
+
+  // Handle All Categories button click - toggle sidebar
+  const handleAllCategoriesClick = () => {
+    dispatch(toggleSidebar());
+  };
+
   return (
     <div>
       <div className="bg-sectionBackgroundLight">
@@ -55,18 +68,19 @@ const Navbar = () => {
             <div className="header-left flex items-center w-1/5">
               <div className="header-bottom-col logo flex justify-start w-[100px] 2md:logo-[185px] lg:w-[200px] ">
                 <div className="logo-inner w-[85px] ml-0 2md:mx-auto 2md:w-[130px]">
-                  <img onClick={() => navigate("/", { replace: true })} src={logo} alt="Amana Big Bazar" className="img-fluid cursor-pointer" />
+                  <img onClick={handleLogoClick} src={logo} alt="Amana Big Bazar" className="img-fluid cursor-pointer" />
                 </div>
               </div>
             </div>
 
             {/* Search for Large Devices */}
-            <div className="w-3/5">
+            <div className="w-2/5">
               <SearchBar />
             </div>
 
             {/* Header Right */}
-            <div className="w-1/5 flex items-center text-right justify-end gap-5 header-bottom-col">
+            <div className="w-2/5 flex items-center text-right justify-end gap-5 header-bottom-col">
+              <Cart></Cart>
               <Location></Location>
 
               <div className="profile-button min-w-[35px] 2md:min-w[65px]">
@@ -160,7 +174,11 @@ const Navbar = () => {
         {/* Categories and Offer */}
         <div className="bg-theme px-5 py-1.5 flex justify-between items-center">
           <div className="all-categories-btn">
-            <button type="button" className="btn text-font-16 tracking-[1px] text-uppercase text-[#F8FAFC] btn-block flex items-center justify-between font-weight-bold bg-theme">
+            <button
+              type="button"
+              className="btn text-font-16 tracking-[1px] text-uppercase text-[#F8FAFC] btn-block flex items-center justify-between font-weight-bold bg-theme hover:bg-green-700 transition-colors"
+              onClick={handleAllCategoriesClick}
+            >
               All Categories <i className="fas fa-list pl-2"></i>
             </button>
           </div>

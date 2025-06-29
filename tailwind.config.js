@@ -10,6 +10,8 @@ export default {
         'ibm-plex': ['IBM Plex Sans', 'sans-serif'],
         'montserrat': ['Montserrat', 'sans-serif'],
         'times': ['"Times New Roman"', 'serif'],
+        'poppins': ['Poppins', 'sans-serif'],
+        'inter': ['Inter', 'sans-serif']
       },
       colors: {
         bodyColor: "#FAFAFA" ,

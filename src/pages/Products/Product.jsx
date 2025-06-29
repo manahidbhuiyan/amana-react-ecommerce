@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import notFoundImage from "../../assets/images/products/no-image.jpg";
 import { useSelector, useDispatch } from "react-redux";
 import redRibbon from "../../assets/images/red-ribbon.png";
-import { loadProductData, pushProductInformation } from "../../features/products/productSlice";
+import { loadProductData, pushProductInformation, clearProductList } from "../../features/products/productSlice";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -11,7 +11,7 @@ const Product = () => {
   const { search } = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  let page = useRef(2);
+  let page = useRef(1);
   const [hasMore, setHasMore] = useState(true);
 
   const queryParams = Object.fromEntries(new URLSearchParams(search));
@@ -21,11 +21,10 @@ const Product = () => {
 
   useEffect(() => {
     setHasMore(true);
-    let queryString = queryParams;
-    let branchId = localStorage.branchId;
-    if (productList?.data.length < 30) {
-      console.log("------------------------------- `1");
-      dispatch(loadProductData({ pageNo: 1, branchId, queryString }));
+    dispatch(clearProductList());
+    console.log("productList.count",productList.count)
+    if(productList.count <= 0){
+      infinateHandler()
     }
   }, [dispatch, search]);
 
@@ -50,7 +49,7 @@ const Product = () => {
         if (result.payload && result.payload.products && result.payload.products.data) {
           const newProducts = result.payload.products.data.filter((obj) => obj.quantity >= 1);
           if (newProducts.length > 0) {
-          console.log("newProducts", newProducts.length)
+            console.log("newProducts", newProducts.length);
             console.log("------------------------------- `2");
 
             // dispatch(pushProductInformation(newProducts));
@@ -73,12 +72,12 @@ const Product = () => {
   };
 
   return (
-    <div className="container mx-auto px-2 py-4">
+    <div className="mx-auto px-4 py-4">
       <div className="bg-gray-300 py-10 px-5 fixed top-32 z-50">
         <p>Total Products : {productList.count} </p>
         <p>Products Loaded : {products.length} </p>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-10 gap-3 lg:gap-7">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 lg:gap-7">
         {products.map((product, index) => {
           return (
             <div key={product._id || index} className={`card product-card bg-white shadow-lg rounded-lg overflow-hidden h-[400px]`}>
@@ -136,7 +135,7 @@ const Product = () => {
           hasMore={hasMore}
           loader={<div className="text-center py-4">Loading more products...</div>}
           endMessage={
-            <p style={{ textAlign: "center" }}>
+            <p className="text-center pt-5 lg:pt-10 ">
               <b>No more product found!</b>
             </p>
           }

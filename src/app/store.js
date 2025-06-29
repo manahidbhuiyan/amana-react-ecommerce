@@ -5,6 +5,7 @@ import authReducer from "../features/auth/authSlice"
 import categoriesReducer from '../features/categories/categoriesSlice';
 import heroReducer from "../features//slice/heroSlice"
 import customerReviewReducer from '../features/slice/customerReviewSlice';
+import sidebarReducer from '../features/slice/sidebarSlice.jsx';
 
 export const store = configureStore({
   reducer: {
@@ -14,5 +15,6 @@ export const store = configureStore({
     categories: categoriesReducer,
     hero: heroReducer,
     customerReview: customerReviewReducer,
+    sidebar: sidebarReducer,
   }, // Reducer gula ekhane add korte hobe
 });
