@@ -44,18 +44,10 @@ const Product = () => {
           })
         );
 
-        console.log("result", result);
-
         if (result.payload && result.payload.products && result.payload.products.data) {
           const newProducts = result.payload.products.data.filter((obj) => obj.quantity >= 1);
           if (newProducts.length > 0) {
-            console.log("newProducts", newProducts.length);
-            console.log("------------------------------- `2");
-
-            // dispatch(pushProductInformation(newProducts));
             page.current++;
-            console.log("page after", page.current);
-            console.log("Total Products", productList);
           } else {
             setHasMore(false);
           }
@@ -73,11 +65,11 @@ const Product = () => {
 
   return (
     <div className="mx-auto px-4 py-4">
-      <div className="bg-gray-300 py-10 px-5 fixed top-32 z-50">
+      {/* <div className="bg-gray-300 py-10 px-5 fixed top-32 z-50">
         <p>Total Products : {productList.count} </p>
         <p>Products Loaded : {products.length} </p>
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 lg:gap-7">
+      </div> */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-7">
         {products.map((product, index) => {
           return (
             <div key={product._id || index} className={`card product-card bg-white shadow-lg rounded-lg overflow-hidden h-[400px]`}>

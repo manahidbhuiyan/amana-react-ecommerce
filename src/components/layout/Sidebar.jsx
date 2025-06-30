@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setExpandedCategory } from "../../features/slice/sidebarSlice";
+import { loadCategoryData } from "../../features/categories/categoriesSlice";
 import {
   Heart,
   Sun,
@@ -25,153 +26,16 @@ import {
 } from "lucide-react";
 
 const Sidebar = ({ isOpen, activeCategory, activeSubCategory, onCategorySelect, onSubCategorySelect, onReset }) => {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const { expandedCategory } = useSelector((state) => state.sidebar);
 
-  const categories = [
-    {
-      id: "favourites",
-      name: "Favourites",
-      icon: Heart,
-      color: "text-red-500",
-      bgColor: "bg-red-50",
-    },
-    {
-      id: "summer",
-      name: "Summer Collection",
-      icon: Sun,
-      color: "text-yellow-500",
-      bgColor: "bg-yellow-50",
-    },
-    {
-      id: "flash",
-      name: "Flash Sales",
-      icon: Zap,
-      color: "text-orange-500",
-      bgColor: "bg-orange-50",
-    },
-    {
-      id: "food",
-      name: "Food",
-      icon: UtensilsCrossed,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-      hasSubCategories: true,
-      subCategories: ["Fruits & Vegetables", "Dairy & Eggs", "Meat & Fish", "Beverages", "Snacks"],
-    },
-    {
-      id: "cleaning",
-      name: "Cleaning Supplies",
-      icon: Sparkles,
-      color: "text-blue-500",
-      bgColor: "bg-blue-50",
-      hasSubCategories: true,
-      subCategories: ["Detergents", "Bathroom Cleaners", "Kitchen Cleaners", "Floor Cleaners"],
-    },
-    {
-      id: "personal",
-      name: "Personal Care",
-      icon: User,
-      color: "text-purple-500",
-      bgColor: "bg-purple-50",
-      hasSubCategories: true,
-      subCategories: ["Women's Care", "Men's Care", "Handwash", "Tissue & Wipes", "Oral Care", "Skin Care", "Talcom Powder", "Hair Color"],
-    },
-    {
-      id: "health",
-      name: "Health & Wellness",
-      icon: Activity,
-      color: "text-teal-500",
-      bgColor: "bg-teal-50",
-      hasSubCategories: true,
-      subCategories: ["Vitamins", "First Aid", "Medicines", "Health Devices"],
-    },
-    {
-      id: "baby",
-      name: "Baby Care",
-      icon: Baby,
-      color: "text-pink-500",
-      bgColor: "bg-pink-50",
-      hasSubCategories: true,
-      subCategories: ["Baby Food", "Diapers", "Baby Bath", "Toys"],
-    },
-    {
-      id: "home",
-      name: "Home & Kitchen",
-      icon: Home,
-      color: "text-indigo-500",
-      bgColor: "bg-indigo-50",
-      hasSubCategories: true,
-      subCategories: ["Cookware", "Storage", "Home Decor", "Appliances"],
-    },
-    {
-      id: "stationery",
-      name: "Stationery & Office",
-      icon: FileText,
-      color: "text-gray-600",
-      bgColor: "bg-gray-50",
-      hasSubCategories: true,
-      subCategories: ["Writing Tools", "Paper Products", "Office Supplies"],
-    },
-    {
-      id: "pet",
-      name: "Pet Care",
-      icon: PawPrint,
-      color: "text-amber-600",
-      bgColor: "bg-amber-50",
-      hasSubCategories: true,
-      subCategories: ["Pet Food", "Pet Accessories", "Pet Health"],
-    },
-    {
-      id: "toys",
-      name: "Toys & Sports",
-      icon: Gamepad2,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-    },
-    {
-      id: "beauty",
-      name: "Beauty & MakeUp",
-      icon: Palette,
-      color: "text-rose-500",
-      bgColor: "bg-rose-50",
-    },
-    {
-      id: "fashion",
-      name: "Fashion & Lifestyle",
-      icon: Shirt,
-      color: "text-violet-500",
-      bgColor: "bg-violet-50",
-    },
-    {
-      id: "vehicle",
-      name: "Vehicle Essentials",
-      icon: Car,
-      color: "text-slate-600",
-      bgColor: "bg-slate-50",
-    },
-    {
-      id: "safety",
-      name: "Safety Center",
-      icon: Shield,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50",
-    },
-    {
-      id: "premium",
-      name: "Premium Care",
-      icon: Star,
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-50",
-    },
-    {
-      id: "recipes",
-      name: "Recipes",
-      icon: BookOpen,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-    },
-  ];
+  // API data থেকে categories
+  useEffect(() => {
+    let branchId = localStorage.branchId;
+    dispatch(loadCategoryData({ branchId }));
+  }, [dispatch]);
+
+  const { CategoriesData, isLoading, isError } = useSelector((state) => state.categories);
 
   const handleCategoryClick = (category) => {
     if (category.hasSubCategories) {
@@ -189,37 +53,101 @@ const Sidebar = ({ isOpen, activeCategory, activeSubCategory, onCategorySelect, 
     onSubCategorySelect(subCategory);
   };
 
-  // Reset expanded when sidebar closes
-  //   useEffect(() => {
-  //     if (!isOpen) {
-  //       setExpandedCategory(null);
-  //     }
-  //   }, [isOpen]);
+  // Default icon mapping for categories
+  const getDefaultIcon = (categoryName) => {
+    const name = categoryName.toLowerCase();
+    if (name.includes('food') || name.includes('fruit') || name.includes('vegetable')) return UtensilsCrossed;
+    if (name.includes('personal') || name.includes('care')) return User;
+    if (name.includes('health') || name.includes('medicine')) return Activity;
+    if (name.includes('baby') || name.includes('child')) return Baby;
+    if (name.includes('home') || name.includes('kitchen')) return Home;
+    if (name.includes('beauty') || name.includes('makeup')) return Palette;
+    if (name.includes('fashion') || name.includes('cloth')) return Shirt;
+    if (name.includes('clean')) return Sparkles;
+    if (name.includes('pet')) return PawPrint;
+    if (name.includes('toy') || name.includes('game')) return Gamepad2;
+    if (name.includes('office') || name.includes('station')) return FileText;
+    return Home; // default icon
+  };
 
-  //   if (!isOpen) return null;
+  // Default color mapping
+  const getDefaultColors = (index) => {
+    const colors = [
+      { color: "text-green-600", bgColor: "bg-green-50" },
+      { color: "text-blue-500", bgColor: "bg-blue-50" },
+      { color: "text-purple-500", bgColor: "bg-purple-50" },
+      { color: "text-red-500", bgColor: "bg-red-50" },
+      { color: "text-yellow-500", bgColor: "bg-yellow-50" },
+      { color: "text-pink-500", bgColor: "bg-pink-50" },
+      { color: "text-indigo-500", bgColor: "bg-indigo-50" },
+      { color: "text-teal-500", bgColor: "bg-teal-50" },
+    ];
+    return colors[index % colors.length];
+  };
 
   return (
     <div className="space-y-1">
-      {categories.map((category) => {
-        const Icon = category.icon;
-        const isActive = activeCategory === category.id;
-        const isExpanded = expandedCategory === category.id;
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {isError && (
+        <div className="text-red-500 text-center py-4">
+          <p>Failed to load categories</p>
+        </div>
+      )}
+
+      {/* Categories from API */}
+      {!isLoading && !isError && CategoriesData && CategoriesData.map((categoryItem, index) => {
+        const category = categoryItem.category;
+        const subcategories = categoryItem.subcategory || [];
+        const Icon = getDefaultIcon(category.name);
+        const colors = getDefaultColors(index);
+        const isActive = activeCategory === category._id;
+        const isExpanded = expandedCategory === category._id;
+        const hasSubCategories = subcategories.length > 0;
 
         return (
-          <div key={category.id} className="select-none">
+          <div key={category._id} className="select-none">
             {/* Main Category */}
             <div
               className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-200 group ${
                 isActive ? `text-themeColor ` : "hover:bg-gray-50"
               }`}
-              onClick={() => handleCategoryClick(category)}
+              onClick={() => handleCategoryClick({
+                id: category._id,
+                name: category.name,
+                hasSubCategories: hasSubCategories
+              })}
             >
               <div className="flex items-center space-x-3 flex-1">
-                <Icon className={`w-5 h-5 ${isActive ? "text-themeColor" : category.color}`} />
-                <span className={`font-medium ${isActive ? "text-themeColor " : "textColorLight"}`}>{category.name}</span>
+                {/* API Icon or Default Icon */}
+                {category.icon ? (
+                  <img
+                    src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/${category.icon}`}
+                    alt={category.name}
+                    className={`w-5 h-5 object-contain ${isActive ? "opacity-100" : "opacity-80"}`}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                ) : null}
+                <Icon 
+                  className={`w-5 h-5 ${isActive ? "text-themeColor" : colors.color} ${category.icon ? 'hidden' : 'block'}`} 
+                  style={{ display: category.icon ? 'none' : 'block', margin: 0 }}
+                />
+                
+                <span className={`font-medium capitalize ${isActive ? "text-themeColor " : "textColorLight"}`}>
+                  {category.name}
+                </span>
               </div>
 
-              {category.hasSubCategories && (
+              {hasSubCategories && (
                 <div className="ml-2">
                   {isExpanded ? (
                     <ChevronDown className={`w-4 h-4 ${isActive ? "text-themeColor " : "text-textColorLight"}`} />
@@ -231,20 +159,20 @@ const Sidebar = ({ isOpen, activeCategory, activeSubCategory, onCategorySelect, 
             </div>
 
             {/* Subcategories */}
-            {category.hasSubCategories && isExpanded && (
+            {hasSubCategories && isExpanded && (
               <div className="ml-8 mt-1 space-y-1 border-l-2 border-gray-100">
-                {category.subCategories.map((subCategory, index) => {
-                  const isSubActive = activeCategory === category.id && activeSubCategory === subCategory;
+                {subcategories.map((subCategory) => {
+                  const isSubActive = activeCategory === category._id && activeSubCategory === subCategory.name;
 
                   return (
                     <div
-                      key={index}
+                      key={subCategory._id}
                       className={`p-2 pl-4 cursor-pointer transition-all duration-200 hover:shadow-sm ${
                         isSubActive ? " text-themeColor" : "text-textColorLight hover:bg-gray-50 hover:text-textColorLight"
                       }`}
-                      onClick={() => handleSubCategoryClick(category.id, subCategory)}
+                      onClick={() => handleSubCategoryClick(category._id, subCategory.name)}
                     >
-                      <span className="text-sm font-medium">{subCategory}</span>
+                      <span className="text-sm font-medium capitalize">{subCategory.name}</span>
                     </div>
                   );
                 })}
@@ -253,6 +181,13 @@ const Sidebar = ({ isOpen, activeCategory, activeSubCategory, onCategorySelect, 
           </div>
         );
       })}
+
+      {/* Empty State */}
+      {!isLoading && !isError && (!CategoriesData || CategoriesData.length === 0) && (
+        <div className="text-gray-500 text-center py-8">
+          <p>No categories available</p>
+        </div>
+      )}
     </div>
   );
 };

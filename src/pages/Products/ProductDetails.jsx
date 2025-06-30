@@ -5,6 +5,7 @@ import { loadProductSingleData } from "../../features/products/productSlice";
 import { ChevronLeft, ChevronRight, ShoppingCart, Plus, Minus, Star, Heart, Share2, Truck, Shield, RotateCcw } from "lucide-react";
 import notFoundImage from "../../assets/images/products/no-image.jpg";
 import { useNavigate } from "react-router-dom";
+import redRibbon from "../../assets/images/red-ribbon.png";
 
 const ProductDetails = () => {
   const { category, subcategory, slug, barcode } = useParams();

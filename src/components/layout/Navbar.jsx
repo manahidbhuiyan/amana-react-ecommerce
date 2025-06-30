@@ -176,7 +176,7 @@ const Navbar = () => {
           <div className="all-categories-btn">
             <button
               type="button"
-              className="btn text-font-16 tracking-[1px] text-uppercase text-[#F8FAFC] btn-block flex items-center justify-between font-weight-bold bg-theme hover:bg-green-700 transition-colors"
+              className="btn text-font-16 tracking-[1px] text-uppercase text-[#F8FAFC] btn-block flex items-center justify-between font-weight-bold transition-colors"
               onClick={handleAllCategoriesClick}
             >
               All Categories <i className="fas fa-list pl-2"></i>

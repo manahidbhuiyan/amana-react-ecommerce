@@ -1,15 +1,19 @@
+// src/App.jsx
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom'; // ✅ import BrowserRouter
+import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './routes/AppRoutes';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
+import LayoutWrapper from './components/layout/LayoutWrapper';
 
 const App = () => {
   return (
-    <BrowserRouter> {/* ✅ Everything inside Router */}
+    <BrowserRouter>
       <Header />
       <main className="pt-[170px] min-h-screen px-4 bg-sectionBackgroundLight">
-        <AppRoutes />
+        <LayoutWrapper>
+          <AppRoutes />
+        </LayoutWrapper>
       </main>
       <Footer />
     </BrowserRouter>
