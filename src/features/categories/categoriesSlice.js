@@ -13,7 +13,12 @@ const initialState = {
 // New products and Special offers
 export const loadCategoryData = createAsyncThunk("categories/loadCategoryData", async ({ branchId }) => {
     const CategoriesData = await getCategoryData(branchId);
-    return CategoriesData.info;
+   
+    const sortedData = CategoriesData.info.sort((a, b) => {
+        return a.category.cust_ser - b.category.cust_ser;
+    });
+    
+    return sortedData;
 });
 
 export const loadProductCategoryData = createAsyncThunk("categories/loadProductCategoryData", async ({ type, slug }) => {
@@ -26,7 +31,8 @@ const categoriesSlice = createSlice({
     initialState,
     reducers: {
         setCategoriesData(state, action) {
-            state.CategoriesData = action.payload;
+            state.CategoriesData = action.payload
+            console.log("action.payload", action.payload)
         },
         setProductCategoryData(state, action) {
             state.ProductCategoryData = action.payload;
