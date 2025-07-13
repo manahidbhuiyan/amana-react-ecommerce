@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import notFoundImage from "../../assets/images/products/no-image.jpg";
 import { loadProductData } from "../../features/products/productSlice";
+import { addToCart } from "../../features/cart/cartSlice";
 import ProductLoadCard from "../common/ProductLoadCard";
 import { useNavigate } from "react-router-dom";
 import { getImageUrl } from "../../utilis/api";
@@ -44,7 +45,10 @@ const NewProducts = () => {
 
       let slicedOffers = {};
       slicedOffers.count = newProducts.count;
-      slicedOffers.data = end_count > new_end_count ? newProducts.data.slice(new_random_number, new_end_count) : newProducts.data.slice(random_Start, end_count);
+      slicedOffers.data =
+        end_count > new_end_count
+          ? newProducts.data.slice(new_random_number, new_end_count)
+          : newProducts.data.slice(random_Start, end_count);
       setSlides(slicedOffers);
     }
   }, [newProducts]);
@@ -58,11 +62,17 @@ const NewProducts = () => {
     navigate(`/products/list/search/?newProduct=${encodeURIComponent(newProductCondition)}`);
   };
 
-  const add_to_cart = (product) =>{
-    let id = product._id
-    let branchId = localStorage.branchId
-    
-  }
+  const add_to_cart = (product) => {
+    let id = product._id;
+    let branchId = localStorage.branchId;
+    console.log("hello")
+    dispatch(
+      addToCart({
+        code: id,
+        branchId,
+      })
+    );
+  };
 
   if (loading) {
     return (
@@ -76,7 +86,9 @@ const NewProducts = () => {
     <div className="py-10">
       <div className="home-new-products">
         <div className="sec-header flex items-center justify-between mb-4">
-          <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold mb-1 ">New Products</h2>
+          <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold mb-1 ">
+            New Products
+          </h2>
           <div className="flex space-x-2">
             <button className="prev-new-product carousel-nav bg-gray-300 text-themeColor w-8 h-8 flex items-center justify-center rounded-full hover:bg-themeColor hover:text-white">
               <i className="fas fa-angle-left"></i>
@@ -139,7 +151,9 @@ const NewProducts = () => {
                   </div>
                   <div className="p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">{product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}</span>
+                      <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">
+                        {product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}
+                      </span>
                     </div>
                     <h3
                       onClick={() => moveToProductDetails(product)}
@@ -152,25 +166,40 @@ const NewProducts = () => {
                     </h3>
                     {product.discount > 0 ? (
                       <div className="flex justify-start gap-3 items-center pt-2">
-                        <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {(product.price.sell - product.discount).toFixed(2)}</div>
+                        <div className="price text-themeColor text-lg font-bold leading-normal">
+                          Tk. {(product.price.sell - product.discount).toFixed(2)}
+                        </div>
                         <del className="text-gray-400 text-sm leading-normal">Tk. {product.price.sell.toFixed(2)}</del>
                       </div>
                     ) : (
                       <div className="flex justify-start gap-2 items-center pt-2">
-                        <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {product.price.sell.toFixed(2)}</div>
+                        <div className="price text-themeColor text-lg font-bold leading-normal">
+                          Tk. {product.price.sell.toFixed(2)}
+                        </div>
                       </div>
                     )}
 
-                    <button onClick={() => add_to_cart(product)} className="w-full bg-themeColor text-white text-sm font-medium py-2 mt-4 rounded hover:bg-[#41b899]">
+                    <button
+                      onClick={() => add_to_cart(product)}
+                      className="w-full bg-themeColor text-white text-sm font-medium py-2 mt-4 rounded hover:bg-[#41b899]"
+                    >
                       <i className="fas fa-shopping-basket"></i> Add To Cart
                     </button>
-                    
+
                     <div className="flex items-center border border-gray-300 rounded-lg mt-4">
-                      <button className="w-1/5 p-3 hover:bg-gray-100 transition-colors cursor-pointer" disabled={product.quantity <= 1}>
+                      <button
+                        className="w-1/5 p-3 hover:bg-gray-100 transition-colors cursor-pointer"
+                        disabled={product.quantity <= 1}
+                      >
                         <Minus className="w-4 h-4" />
                       </button>
-                      <span className="w-3/5 px-4 py-3 border-x border-gray-300 font-medium text-center cursor-pointer">{product.quantity}</span>
-                      <button className="w-1/5 p-3 hover:bg-gray-100 transition-colors cursor-pointer" disabled={product.quantity >= product?.maxQuantity}>
+                      <span className="w-3/5 px-4 py-3 border-x border-gray-300 font-medium text-center cursor-pointer">
+                        {product.quantity}
+                      </span>
+                      <button
+                        className="w-1/5 p-3 hover:bg-gray-100 transition-colors cursor-pointer"
+                        disabled={product.quantity >= product?.maxQuantity}
+                      >
                         <Plus className="w-4 h-4" />
                       </button>
                     </div>

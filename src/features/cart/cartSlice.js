@@ -11,9 +11,9 @@ const initialState = {
 
 // New products and Special offers
 export const addToCart = createAsyncThunk("cart/addToCart", async ({ code, branchId }) => {
-    const products = await addProductOnCart(code, branchId);
-    console.log("products", products)
-    return products;
+    const cartProducts = await addProductOnCart(code, branchId);
+    console.log("cartProducts",cartProducts)
+    return cartProducts;
 });
 
 const cartSlice = createSlice({
@@ -39,7 +39,7 @@ const cartSlice = createSlice({
           })
           .addCase(addToCart.fulfilled, (state, action) => {
             state.isLoading = false;
-            state.isLoading = action.payload;
+            state.CartInformation = action.payload;
           })
           .addCase(addToCart.rejected, (state, action) => {
             state.isLoading = false;
@@ -48,5 +48,9 @@ const cartSlice = createSlice({
           })
       },
 })
+
+export const { setCartInformation, setLoading, clearError } = cartSlice.actions;
+
+export default cartSlice.reducer;
 
 
