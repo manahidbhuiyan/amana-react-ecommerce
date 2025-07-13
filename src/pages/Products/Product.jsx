@@ -22,15 +22,13 @@ const Product = () => {
   useEffect(() => {
     setHasMore(true);
     dispatch(clearProductList());
-    console.log("productList.count",productList.count)
-    if(productList.count <= 0){
-      infinateHandler()
+    if (productList.count <= 0) {
+      infinateHandler();
     }
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   }, [dispatch, search]);
 
   const infinateHandler = useCallback(async () => {
-    console.log("Total Products init", productList);
-
     {
       let queryString = queryParams;
       let branchId = localStorage.branchId;

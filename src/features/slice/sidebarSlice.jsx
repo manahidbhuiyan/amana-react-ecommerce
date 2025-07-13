@@ -23,7 +23,7 @@ const sidebarSlice = createSlice({
     },
     setActiveCategory: (state, action) => {
       state.activeCategory = action.payload;
-      state.activeSubCategory = null; // Reset subcategory when changing category
+      state.activeSubCategory = null;
     },
     setActiveSubCategory: (state, action) => {
       state.activeSubCategory = action.payload;

@@ -6,6 +6,8 @@ import ProductLoadCard from "../common/ProductLoadCard";
 import { useNavigate } from "react-router-dom";
 import { getImageUrl } from "../../utilis/api";
 
+import { Plus, Minus } from "lucide-react";
+
 // swiper
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
@@ -55,6 +57,12 @@ const NewProducts = () => {
     const newProductCondition = true;
     navigate(`/products/list/search/?newProduct=${encodeURIComponent(newProductCondition)}`);
   };
+
+  const add_to_cart = (product) =>{
+    let id = product._id
+    let branchId = localStorage.branchId
+    
+  }
 
   if (loading) {
     return (
@@ -113,7 +121,7 @@ const NewProducts = () => {
           {slides.count > 0 &&
             slides.data.map((product, index) => (
               <SwiperSlide key={product._id || index}>
-                <div className="card product-card bg-white shadow-lg rounded-lg overflow-hidden h-[400px] ">
+                <div className="card product-card bg-white shadow-lg rounded-lg overflow-hidden h-[420px] ">
                   <div className="relative">
                     {product.discount > 0 && (
                       <div className="absolute top-0 right-0 w-[70px] h-[70px] p-[15px] pt-[15px] bg-[url('../../assets/images/offer.png')] bg-no-repeat bg-cover bg-center text-white text-center text-[15px] font-bold z-5">
@@ -153,9 +161,19 @@ const NewProducts = () => {
                       </div>
                     )}
 
-                    <button className="w-full bg-themeColor text-white text-sm font-medium py-2 mt-4 rounded hover:bg-[#41b899]">
+                    <button onClick={() => add_to_cart(product)} className="w-full bg-themeColor text-white text-sm font-medium py-2 mt-4 rounded hover:bg-[#41b899]">
                       <i className="fas fa-shopping-basket"></i> Add To Cart
                     </button>
+                    
+                    <div className="flex items-center border border-gray-300 rounded-lg mt-4">
+                      <button className="w-1/5 p-3 hover:bg-gray-100 transition-colors cursor-pointer" disabled={product.quantity <= 1}>
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="w-3/5 px-4 py-3 border-x border-gray-300 font-medium text-center cursor-pointer">{product.quantity}</span>
+                      <button className="w-1/5 p-3 hover:bg-gray-100 transition-colors cursor-pointer" disabled={product.quantity >= product?.maxQuantity}>
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </SwiperSlide>
