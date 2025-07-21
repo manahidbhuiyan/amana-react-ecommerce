@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import notFoundImage from "../../assets/images/products/no-image.jpg";
 import { loadProductData } from "../../features/products/productSlice";
+import { addToCart, addToLocalCart } from "../../features/cart/cartSlice";
 import ProductLoadCard from "../common/ProductLoadCard";
 import { useNavigate } from "react-router-dom";
 import { getImageUrl } from "../../utilis/api";
@@ -22,6 +23,7 @@ const NewProducts = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { newProducts } = useSelector((state) => state.products);
+  const isLoading = useSelector(state => state.cart.isLoading);
 
   useEffect(() => {
     let queryString = {
@@ -59,9 +61,13 @@ const NewProducts = () => {
   };
 
   const add_to_cart = (product) =>{
-    let id = product._id
+    let code = product._id
     let branchId = localStorage.branchId
-    
+    if(localStorage.userToken){
+      dispatch(addToCart({ code, branchId}));
+    }else{
+      dispatch(addToLocalCart(product));
+    }
   }
 
   if (loading) {

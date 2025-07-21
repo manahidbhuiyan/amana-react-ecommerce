@@ -28,7 +28,7 @@ const Navbar = () => {
   useEffect(() => {
     if (userInformation && Object.keys(userInformation).length > 0) {
       setIsLoggedIn(true);
-      // navigate("/", { replace: true });
+      navigate("/", { replace: true });
     } else {
       setIsLoggedIn(false);
     }

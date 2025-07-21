@@ -1,7 +1,14 @@
 import React from 'react';
 import { Heart, ShoppingCart } from 'lucide-react';
+import { useDispatch } from 'react-redux';
 
 const Header = () => {
+
+  const dispatch = useDispatch();
+
+  const handleCartClick = () =>{
+    dispatch ()
+  }
   return (
     <div className="flex items-center justify-end space-x-6">
       {/* Wishlist */}
@@ -16,7 +23,7 @@ const Header = () => {
       </div>
 
       {/* Cart */}
-      <div className="flex items-center space-x-1 cursor-pointer hover:text-themeColor transition-colors group">
+      <div className="flex items-center space-x-1 cursor-pointer hover:text-themeColor transition-colors group" onClick={handleCartClick}>
         <div className="flex items-center space-x-2">
           <div className="relative">
             <ShoppingCart className="w-6 h-6 text-gray-600 group-hover:text-themeColor" />

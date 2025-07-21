@@ -3,27 +3,29 @@ import React, { useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { setActiveCategory, setActiveSubCategory } from "../../features/slice/sidebarSlice";
+import { loadLocalCartProducts } from "../../features/cart/cartSlice";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Location from "./Navbar/Location/Location";
 import Sidebar from "./Sidebar";
+import CartDetails from "../../pages/Cart/CartDetails";
 
 const LayoutWrapper = ({ children }) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const locationRef = useRef(null);
   const localSelectArea = localStorage.getItem("selectedArea");
-  
+
   // Get sidebar state from Redux
   const { isOpen: sidebarOpen, activeCategory, activeSubCategory } = useSelector((state) => state.sidebar);
 
   // Import configuration
   // import { shouldShowSidebar as checkSidebar } from "../../config/sidebarConfig";
-  
+
   // Define pages where sidebar should be excluded
-  const excludedPages = ['/checkout', '/order', '/payment', '/login', '/register'];
+  const excludedPages = ["/checkout", "/order", "/payment", "/login", "/register"];
   const shouldShowSidebar = !excludedPages.includes(location.pathname);
-  
+
   // Alternative: Use configuration file
   // const shouldShowSidebar = checkSidebar(location.pathname);
 
@@ -56,6 +58,10 @@ const LayoutWrapper = ({ children }) => {
     dispatch(setActiveSubCategory(subCategory));
   };
 
+  useEffect(() => {
+    dispatch(loadLocalCartProducts());
+  }, [dispatch]);
+
   return (
     <div className="bg-sectionBackgroundLight relative">
       <ToastContainer />
@@ -65,7 +71,7 @@ const LayoutWrapper = ({ children }) => {
           {sidebarOpen && shouldShowSidebar && (
             <div className="fixed left-0 top-[170px] w-1/5 bg-white shadow-lg h-[calc(100vh-170px)] overflow-y-auto border-r border-gray-200 z-10">
               <div className="p-4">
-                <Sidebar 
+                <Sidebar
                   isOpen={sidebarOpen}
                   activeCategory={activeCategory}
                   activeSubCategory={activeSubCategory}
@@ -75,13 +81,11 @@ const LayoutWrapper = ({ children }) => {
               </div>
             </div>
           )}
-          
+
           {/* Main Content - Adjust margin based on sidebar state and page type */}
-          <div className={`transition-all duration-300 ${
-            sidebarOpen && shouldShowSidebar ? 'ml-[20%]' : 'ml-0'
-          }`}>
+          <div className={`transition-all duration-300 ${sidebarOpen && shouldShowSidebar ? "ml-[20%]" : "ml-0"}`}>
             {/* Show selected category/subcategory info for testing (only on pages with sidebar) */}
-            {shouldShowSidebar && (activeCategory || activeSubCategory) && (
+            {/* {shouldShowSidebar && (activeCategory || activeSubCategory) && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 m-4">
                 <h3 className="text-lg font-semibold text-green-800">
                   {activeCategory && `Category: ${activeCategory}`}
@@ -91,10 +95,11 @@ const LayoutWrapper = ({ children }) => {
                   Products will be filtered based on this selection
                 </p>
               </div>
-            )}
-            
+            )} */}
+
             {/* Render children components */}
             {children}
+            {/* <CartDetails /> */}
           </div>
         </div>
       ) : (

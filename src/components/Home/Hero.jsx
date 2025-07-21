@@ -42,6 +42,8 @@ const Hero = () => {
   ];
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+
     const branchId = localStorage.branchId;
     if (branchId) {
       dispatch(fetchHeroBanners(branchId));
