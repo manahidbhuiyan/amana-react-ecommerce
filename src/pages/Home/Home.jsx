@@ -7,7 +7,6 @@ import Catrgories from "../../components/Home/AllCategories";
 import Testimonial from "../../components/Home/Testimonial";
 
 const Home = () => {
- 
 
   return (
     <>

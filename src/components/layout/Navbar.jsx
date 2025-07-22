@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loadUser, logOutUser } from "../../features/auth/authSlice";
 import { toggleSidebar, resetSidebarSelections } from "../../features/slice/sidebarSlice";
+import { openCartModule } from "../../features/cart/cartSlice";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -58,6 +59,10 @@ const Navbar = () => {
     dispatch(toggleSidebar());
   };
 
+  // const cartOpen = () =>{
+  //   dispatch(openCartModule())
+  // }
+
   return (
     <div>
       <div className="bg-sectionBackgroundLight">
@@ -80,7 +85,7 @@ const Navbar = () => {
 
             {/* Header Right */}
             <div className="w-2/5 flex items-center text-right justify-end gap-5 header-bottom-col">
-              <Cart></Cart>
+              <Cart ></Cart>
               <Location></Location>
 
               <div className="profile-button min-w-[35px] 2md:min-w[65px]">
