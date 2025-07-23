@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import notFoundThumb from "../../assets/images/noImageThumbnail2.jpg";
 import { useDispatch } from "react-redux";
 import { closeCartModule, clearAllCart } from "../../features/cart/cartSlice";
+import { Truck } from "lucide-react";
 
 const Cart = () => {
   const dispatch = useDispatch();
@@ -54,7 +55,10 @@ const Cart = () => {
           <h4 className="text-base font-semibold text-gray-800">Cart ({totalItems} Items)</h4>
           <div className="flex items-center space-x-2">
             {totalItems > 0 && (
-              <button className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-medium transition-colors" onClick={cartClear}>
+              <button
+                className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-medium transition-colors"
+                onClick={cartClear}
+              >
                 Clear Cart
               </button>
             )}
@@ -68,7 +72,24 @@ const Cart = () => {
       {/* Cart Content - Scrollable */}
       <div className="flex-1 overflow-hidden flex flex-col h-full z-40">
         {CartInformation && CartInformation.length > 0 ? (
-          <>
+               <>
+            {/* Delivery Info Banner */}
+            <div className="mt-2 mx-4 py-1 px-2 bg-green-50 rounded-lg border border-green-200">
+              <div className="flex items-center gap-2 text-green-700">
+                <Truck size={16} />
+                <span className="text-sm font-medium">
+                  {subtotal < 500 ? (
+                    <p className="">
+                      Add ৳<strong>{500 - subtotal}</strong> more to unlock Free Delivery!
+                    </p>
+                  ) : (
+                    <p className="">
+                      You’ve unlocked <strong>Free Delivery!</strong>
+                    </p>
+                  )}
+                </span>
+              </div>
+            </div>
             {/* Products List - Scrollable */}
             <div className="flex-1 overflow-y-auto px-3 py-2 pb-[54px] ">
               <div className="space-y-2">
@@ -78,11 +99,16 @@ const Cart = () => {
                   const itemTotal = (itemPrice * (item.quantity || 0)).toFixed(2);
 
                   return (
-                    <div key={index} className="flex items-start space-x-2 py-1 border-b border-gray-100 last:border-none ">
+                    <div
+                      key={index}
+                      className="flex items-start space-x-2 py-1 border-b border-gray-100 last:border-none "
+                    >
                       <img
-                        src={localStorage.userToken ? item?.thumbnail || notFoundThumb : item?.images?.[0] || notFoundThumb}
+                        src={
+                          localStorage.userToken ? item?.thumbnail || notFoundThumb : item?.images?.[0] || notFoundThumb
+                        }
                         // alt="product"
-                        className="w-10 h-10 object-cover rounded-full flex-shrink-0"
+                        className="w-[60px] h-[60px] object-cover rounded-full flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <h5 className="text-xs font-medium text-gray-800 truncate">{item?.name}</h5>
@@ -98,7 +124,12 @@ const Cart = () => {
                           <button className="px-1.5 py-0.5 hover:bg-gray-100 text-gray-600 text-xs">
                             <i className="fas fa-minus"></i>
                           </button>
-                          <input type="text" value={item.quantity} className="w-8 text-center border-0 outline-none text-xs" readOnly />
+                          <input
+                            type="text"
+                            value={item.quantity}
+                            className="w-8 text-center border-0 outline-none text-xs"
+                            readOnly
+                          />
                           <button className="px-1.5 py-0.5 hover:bg-gray-100 text-gray-600 text-xs">
                             <i className="fas fa-plus"></i>
                           </button>
@@ -116,7 +147,7 @@ const Cart = () => {
             </div>
 
             {/* Checkout Section - Fixed */}
-            <div className="z-30 relative bottom-[50px] bg-white border-t border-gray-200 p-3">
+            <div className="z-30 relative bottom-[92px] bg-white border-t border-gray-200 p-3">
               {/* Totals */}
               <div className="space-y-1 mb-3">
                 <div className="flex justify-between items-center text-xs">
@@ -142,7 +173,9 @@ const Cart = () => {
 
               <div className="flex justify-between items-center pt-3 border-t">
                 {/* Checkout Button */}
-                <button className=" bg-themeColor text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors">Checkout</button>
+                <button className=" bg-themeColor text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors">
+                  Checkout
+                </button>
                 <div className="flex flex-end items-center text-sm space-x-1 ">
                   <span className="font-bold">Total:</span>
                   <span>৳{finalTotal.toFixed(2)}</span>
