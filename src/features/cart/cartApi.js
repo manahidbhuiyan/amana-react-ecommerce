@@ -7,15 +7,30 @@ export const addProductOnCart = async (code, branch) => {
   }
   try {
 
-    const res = await axios.post('/api/cart/',{
-        code: code,
-        branch: branch
+    const res = await axios.post('/api/cart/', {
+      code: code,
+      branch: branch
     })
 
     return res.data;
 
   } catch (error) {
-    console.log(error)
+    console.error('Error adding to cart:', error);
+    throw error;
+  }
+}
+
+export const updateProductQuantity = async (productId, quantity, branchId) => {
+  try {
+    if (localStorage.userToken) {
+      setAuthToken(localStorage.userToken)
+    }
+    const response = await axios.put('/api/cart', {
+      id: productId, quantity: quantity, branch: branchId || localStorage.branchId
+    })
+    return response.data;
+  } catch (error) {
+    console.error('Error updating cart quantity:', error);
     throw error;
   }
 }
@@ -28,17 +43,18 @@ export const resetCart = async (branch) => {
   try {
 
     // const res = await axios.post('/api/cart/delete',{id:id,branch:branch})
-    const res = await axios.delete('/api/cart/delete',{
-      data:{
-        id:null,
-        branch:branch,
-        clear_all:"true"}
+    const res = await axios.delete('/api/cart/delete', {
+      data: {
+        id: null,
+        branch: branch,
+        clear_all: "true"
+      }
     })
 
-    console.log("res",res)
-    return res;
+    return res.data;
 
   } catch (error) {
-    console.log(error)
+    console.error('Error clearing cart:', error);
+    throw error;
   }
 }

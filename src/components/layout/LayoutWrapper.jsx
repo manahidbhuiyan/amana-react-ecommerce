@@ -19,7 +19,6 @@ const LayoutWrapper = ({ children }) => {
   // Get sidebar state from Redux
   const { isOpen: sidebarOpen, activeCategory, activeSubCategory } = useSelector((state) => state.sidebar);
   const { isCartOpen } = useSelector((state) => state.cart);
-  console.log("isCartOpen", isCartOpen);
 
   // Define pages where sidebar should be excluded
   const excludedPages = ["/checkout", "/order", "/payment", "/login", "/register"];

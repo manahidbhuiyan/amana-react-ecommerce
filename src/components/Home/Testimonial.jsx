@@ -53,8 +53,21 @@ const Testimonial = () => {
     );
   }
 
+    // Custom styles object
+  const customStyles = `
+    .testimonial-swiper .swiper-pagination {
+      bottom: -50px !important;
+    }
+    .testimonial-swiper .swiper-pagination-bullet {
+      width: 12px !important;
+      height: 12px !important;
+      margin: 0 6px !important;
+    }
+  `;
+
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-4">
+      <style dangerouslySetInnerHTML={{ __html: customStyles }} />
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -122,17 +135,6 @@ const Testimonial = () => {
         </div>
       </div>
 
-      {/* Custom Swiper Styles */}
-      <style jsx>{`
-        .testimonial-swiper .swiper-pagination {
-          bottom: -50px !important;
-        }
-        .testimonial-swiper .swiper-pagination-bullet {
-          width: 12px !important;
-          height: 12px !important;
-          margin: 0 6px !important;
-        }
-      `}</style>
     </div>
   );
 };
