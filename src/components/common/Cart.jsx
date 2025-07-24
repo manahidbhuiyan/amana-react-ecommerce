@@ -26,8 +26,6 @@ const Header = () => {
     return total + ((item.price.sell ? item.price.sell : item.price) || 0) * (item.quantity || 1);
   }, 0);
 
-  console.log("cartTotalItem", cartTotalItem);
-
   const handleCartClick = () => {
     dispatch(openCartModule());
   };

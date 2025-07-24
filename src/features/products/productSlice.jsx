@@ -83,7 +83,6 @@ const productSlice = createSlice({
         state.isError = false;
       })
       .addCase(loadProductData.fulfilled, (state, action) => {
-        console.log("actionactionactionactionaction", action);
         state.isLoading = false;
 
         if (action.payload.queryType === "newProduct") {

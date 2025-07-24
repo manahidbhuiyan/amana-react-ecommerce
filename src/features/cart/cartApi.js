@@ -35,14 +35,32 @@ export const updateProductQuantity = async (productId, quantity, branchId) => {
   }
 }
 
+export const productDelete = async (productId, branch) =>{
+   if (localStorage.userToken) {
+    setAuthToken(localStorage.userToken)
+  }
+    try {
+    const res = await axios.delete('/api/cart/delete', {
+      data: {
+        id: productId,
+        branch: branch,
+        clear_all: "false"
+      }
+    })
+    return res.data;
+
+  } catch (error) {
+    console.error('Error clearing cart:', error);
+    throw error;
+  }
+}
+
 
 export const resetCart = async (branch) => {
   if (localStorage.userToken) {
     setAuthToken(localStorage.userToken)
   }
   try {
-
-    // const res = await axios.post('/api/cart/delete',{id:id,branch:branch})
     const res = await axios.delete('/api/cart/delete', {
       data: {
         id: null,

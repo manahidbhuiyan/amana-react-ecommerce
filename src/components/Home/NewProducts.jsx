@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import notFoundImage from "../../assets/images/products/no-image.jpg";
 import { loadProductData } from "../../features/products/productSlice";
-import { addToCart, addToLocalCart, updateCartQuantity, updateLocalCartQuantity } from "../../features/cart/cartSlice";
+import { addToCart, addToLocalCart, updateCartQuantity, updateLocalCartQuantity, removeFromCart, removeFromLocalCart } from "../../features/cart/cartSlice";
 import ProductLoadCard from "../common/ProductLoadCard";
 import { useNavigate } from "react-router-dom";
 import { getImageUrl } from "../../utilis/api";
@@ -38,9 +38,8 @@ const NewProducts = () => {
     return map;
   }, [CartInformation]);
 
-   // Helper function to check if product is in cart
+  // Helper function to check if product is in cart
   const checkProductToCart = (product) => {
-    console.log("checked",product.name)
     return cartItemsMap.get(product._id) || null;
   };
 
@@ -65,24 +64,10 @@ const NewProducts = () => {
 
       let slicedOffers = {};
       slicedOffers.count = newProducts.count;
-      slicedOffers.data =
-        end_count > new_end_count
-          ? newProducts.data.slice(new_random_number, new_end_count)
-          : newProducts.data.slice(random_Start, end_count);
+      slicedOffers.data = end_count > new_end_count ? newProducts.data.slice(new_random_number, new_end_count) : newProducts.data.slice(random_Start, end_count);
       setSlides(slicedOffers);
     }
   }, [newProducts]);
-
-  // const checkProductToCart = (product) => {
-  //   console.log("product", product);
-  //   console.log("CartInformation checkProductToCart", CartInformation);
-  //   const cartItems = CartInformation;
-  //   const foundItem = cartItems.find((item) =>
-  //     localStorage.userToken ? item.product._id === product._id : item._id === product._id
-  //   );
-  //   console.log("foundItem", foundItem);
-  //   return foundItem || null;
-  // };
 
   const moveToProductDetails = (product) => {
     navigate(`/product/${product.category.name}/${product.subcategory.name}/${product.slug}/${product.barcode}`);
@@ -106,9 +91,7 @@ const NewProducts = () => {
 
   // Quantity increase function
   const cartQuantityPlus = (product) => {
-    // console.log("product", product);
     const cartItem = checkProductToCart(product);
-    // console.log("cartItem---", cartItem);
 
     if (cartItem && cartItem.quantity < cartItem.maxQuantity) {
       const newQuantity = cartItem.quantity + 1;
@@ -131,8 +114,7 @@ const NewProducts = () => {
     } else {
       toast.warning(
         <div>
-          We are very sorry! We currently do not have the quantity of <strong>'{cartItem.name}'</strong> in stock that
-          you require.
+          We are very sorry! We currently do not have the quantity of <strong>'{cartItem.name}'</strong> in stock that you require.
         </div>,
         {
           position: "top-center",
@@ -168,8 +150,19 @@ const NewProducts = () => {
           })
         );
       }
+    } else if(cartItem && cartItem.quantity == 1)  {
+      removeProduct(cartItem)
     }
   };
+
+   const removeProduct = (item) => {
+      const productId = item._id;
+      if (localStorage.userToken) {
+        dispatch(removeFromCart({productId}));
+      } else {
+        dispatch(removeFromLocalCart(productId));
+      }
+    };
 
   if (loading) {
     return (
@@ -183,9 +176,7 @@ const NewProducts = () => {
     <div className="py-10">
       <div className="home-new-products">
         <div className="sec-header flex items-center justify-between mb-4">
-          <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold mb-1">
-            New Products
-          </h2>
+          <h2 className="text-font-14 sm:text-font-16 md:text-font-26 lg:text-font-32 text-themeColor capitalize font-bold mb-1">New Products</h2>
           <div className="flex space-x-2">
             <button className="prev-new-product carousel-nav bg-gray-300 text-themeColor w-8 h-8 flex items-center justify-center rounded-full hover:bg-themeColor hover:text-white">
               <i className="fas fa-angle-left"></i>
@@ -228,8 +219,6 @@ const NewProducts = () => {
         >
           {slides.count > 0 &&
             slides.data.map((product, index) => {
-              // const cartItem = checkProductToCart(product);
-
               return (
                 <SwiperSlide key={product._id || index}>
                   <div className="card product-card bg-white shadow-lg rounded-lg overflow-hidden h-[420px]">
@@ -241,18 +230,12 @@ const NewProducts = () => {
                         </div>
                       )}
 
-                      <img
-                        src={product.images && product.images[0] ? getImageUrl(product.images[0]) : notFoundImage}
-                        alt="Product Image swiper-lazy"
-                        className="w-full h-48 object-cover"
-                      />
+                      <img src={product.images && product.images[0] ? getImageUrl(product.images[0]) : notFoundImage} alt="Product Image swiper-lazy" className="w-full h-48 object-cover" />
                     </div>
 
                     <div className="p-4">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">
-                          {product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}
-                        </span>
+                        <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">{product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}</span>
                       </div>
 
                       <h3
@@ -267,66 +250,58 @@ const NewProducts = () => {
 
                       {product.discount > 0 ? (
                         <div className="flex justify-start gap-3 items-center pt-2">
-                          <div className="price text-themeColor text-lg font-bold leading-normal">
-                            Tk. {(product.price.sell - product.discount).toFixed(2)}
-                          </div>
-                          <del className="text-gray-400 text-sm leading-normal">
-                            Tk. {product.price.sell.toFixed(2)}
-                          </del>
+                          <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {(product.price.sell - product.discount).toFixed(2)}</div>
+                          <del className="text-gray-400 text-sm leading-normal">Tk. {product.price.sell.toFixed(2)}</del>
                         </div>
                       ) : (
                         <div className="flex justify-start gap-2 items-center pt-2">
-                          <div className="price text-themeColor text-lg font-bold leading-normal">
-                            Tk. {product.price.sell.toFixed(2)}
-                          </div>
+                          <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {product.price.sell.toFixed(2)}</div>
                         </div>
                       )}
 
                       {/* Stock check */}
-                     {product.quantity > 0 ? (
-                      <div className="actions mt-4">
-                        {/* Direct check - no extra function call */}
-                        {!cartItemsMap.get(product._id) ? (
-                          <button
-                            onClick={() => add_to_cart(product)}
-                            disabled={isLoading}
-                            className="w-full bg-themeColor text-white text-sm font-medium py-2 rounded hover:bg-[#41b899] disabled:opacity-50"
-                          >
-                            <i className="fas fa-shopping-basket"></i>
-                            {isLoading ? " Adding..." : " Add To Cart"}
-                          </button>
-                        ) : (
-                          // Quantity Controls
-                          <div className="flex items-center border border-gray-300 rounded-lg">
+                      {product.quantity > 0 ? (
+                        <div className="actions mt-4">
+                          {/* Direct check - no extra function call */}
+                          {!cartItemsMap.get(product._id) ? (
                             <button
-                              onClick={() => cartQuantityMinus(product)}
-                              className="w-1/5 p-3 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50"
-                              disabled={cartItemsMap.get(product._id)?.quantity <= 1}
+                              onClick={() => add_to_cart(product)}
+                              disabled={isLoading}
+                              className="w-full bg-themeColor text-white text-sm font-medium py-2 rounded hover:bg-[#41b899] disabled:opacity-50"
                             >
-                              <Minus className="w-4 h-4" />
+                              <i className="fas fa-shopping-basket"></i>
+                              {isLoading ? " Adding..." : " Add To Cart"}
                             </button>
-                            <span className="w-3/5 px-4 py-2 border-x border-gray-300 font-medium text-center cursor-pointer">
-                              {cartItemsMap.get(product._id)?.quantity || 0}
-                            </span>
-                            <button
-                              onClick={() => cartQuantityPlus(product)}
-                              className="w-1/5 p-3 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50"
-                              disabled={cartItemsMap.get(product._id)?.quantity >= cartItemsMap.get(product._id)?.maxQuantity}
-                            >
-                              <Plus className="w-4 h-4" />
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                          ) : (
+                            // Quantity Controls
+                            <div className="flex items-center border border-gray-300 rounded-lg">
+                              <button
+                                onClick={() => cartQuantityMinus(product)}
+                                className="w-1/5 p-3 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50"
+                                // disabled={cartItemsMap.get(product._id)?.quantity <= 1}
+                              >
+                                <Minus className="w-4 h-4" />
+                              </button>
+                              <span className="w-3/5 px-4 py-2 border-x border-gray-300 font-medium text-center cursor-pointer">{cartItemsMap.get(product._id)?.quantity || 0}</span>
+                              <button
+                                onClick={() => cartQuantityPlus(product)}
+                                className="w-1/5 p-3 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50"
+                                // disabled={cartItemsMap.get(product._id)?.quantity >= cartItemsMap.get(product._id)?.maxQuantity}
+                              >
+                                <Plus className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       ) : (
                         // Out of Stock
                         <div className="mt-4 text-center">
-                        <span className="text-red-500 font-bold">Out of Stock</span>
-                      </div>
-                    )}
+                          <span className="text-red-500 font-bold">Out of Stock</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </SwiperSlide>
+                </SwiperSlide>
               );
             })}
 

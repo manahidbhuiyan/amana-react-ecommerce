@@ -72,24 +72,22 @@ const cartSlice = createSlice({
                 state.CartInformation = existingCartProducts;
             }
         },
-        // Update local cart quantity for guest users
+        
+        // Optimized update local cart quantity
         updateLocalCartQuantity(state, action) {
             const { productId, quantity } = action.payload;
             const existingCartProducts = JSON.parse(localStorage.getItem("localCartProduct")) || [];
 
-            const updatedCartProducts = existingCartProducts.map(item => {
-                if (item._id === productId) {
-                    return {
-                        ...item,
-                        quantity: quantity
-                    };
-                }
-                return item;
-            });
-            localStorage.setItem("localCartProduct", JSON.stringify(updatedCartProducts));
-            state.CartInformation = updatedCartProducts;
+            // Find and update only the specific item
+            const itemIndex = existingCartProducts.findIndex(item => item._id === productId);
+            if (itemIndex !== -1) {
+                existingCartProducts[itemIndex].quantity = quantity;
+                localStorage.setItem("localCartProduct", JSON.stringify(existingCartProducts));
+                state.CartInformation = existingCartProducts;
+            }
         },
-        // Remove from local cart
+        
+        // Optimized remove from local cart
         removeFromLocalCart(state, action) {
             const productId = action.payload;
             const existingCartProducts = JSON.parse(localStorage.getItem("localCartProduct")) || [];
@@ -99,11 +97,13 @@ const cartSlice = createSlice({
             localStorage.setItem("localCartProduct", JSON.stringify(filteredCartProducts));
             state.CartInformation = filteredCartProducts;
         },
+        
         // Load from localStorage to Redux (for app initialization)
         loadLocalCartProducts(state) {
             const existingCartProducts = JSON.parse(localStorage.getItem("localCartProduct")) || [];
             state.CartInformation = existingCartProducts;
         },
+        
         // Sync cart data after login
         syncCartAfterLogin(state) {
             const localCartProducts = JSON.parse(localStorage.getItem("localCartProduct")) || [];
@@ -114,7 +114,7 @@ const cartSlice = createSlice({
 
             localCartProducts.forEach(localProduct => {
                 const existsInServerCart = serverCartProducts.some(serverProduct =>
-                    serverProduct._id === localProduct._id
+                    (serverProduct.product?._id || serverProduct._id) === localProduct._id
                 );
 
                 if (!existsInServerCart) {
@@ -135,14 +135,17 @@ const cartSlice = createSlice({
             })
             .addCase(addToCart.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.isLoading = false;
                 const productsArray = action.payload.data || action.payload;
 
                 // Get existing products from localStorage
                 const existingCartProducts = JSON.parse(localStorage.getItem("CartProduct")) || [];
 
                 productsArray.forEach(product => {
-                    const isProductExists = existingCartProducts.some(item => item._id === product._id);
+                    const isProductExists = existingCartProducts.some(item => {
+                        const itemProductId = item.product?._id || item._id;
+                        const newProductId = product.product?._id || product._id;
+                        return itemProductId === newProductId;
+                    });
 
                     if (!isProductExists) {
                         const modifiedProduct = {
@@ -154,18 +157,16 @@ const cartSlice = createSlice({
                     }
                 });
 
-
-
                 localStorage.setItem("CartProduct", JSON.stringify(existingCartProducts));
                 state.CartInformation = existingCartProducts;
-
             })
             .addCase(addToCart.rejected, (state, action) => {
                 state.isLoading = false;
                 state.isError = true;
                 state.error = action.error?.message;
             })
-            // update qunatity
+            
+            // Optimized update quantity
             .addCase(updateCartQuantity.pending, (state) => {
                 state.isLoading = true;
                 state.isError = false;
@@ -176,25 +177,20 @@ const cartSlice = createSlice({
 
                 // Update in localStorage
                 const existingCartProducts = JSON.parse(localStorage.getItem("CartProduct")) || [];
-                const updatedCartProducts = existingCartProducts.map(item => {
-                    if (item._id === productId) {
-                        return {
-                            ...item,
-                            quantity: quantity
-                        };
-                    }
-                    return item;
-                });
-
-                localStorage.setItem("CartProduct", JSON.stringify(updatedCartProducts));
-                state.CartInformation = updatedCartProducts;
-
+                const itemIndex = existingCartProducts.findIndex(item => item._id === productId);
+                
+                if (itemIndex !== -1) {
+                    existingCartProducts[itemIndex].quantity = quantity;
+                    localStorage.setItem("CartProduct", JSON.stringify(existingCartProducts));
+                    state.CartInformation = existingCartProducts;
+                }
             })
             .addCase(updateCartQuantity.rejected, (state, action) => {
                 state.isLoading = false;
                 state.isError = true;
                 state.error = action.error?.message;
             })
+            
             // product delete from cart
             .addCase(removeFromCart.pending, (state) => {
                 state.isLoading = true;
@@ -202,25 +198,30 @@ const cartSlice = createSlice({
             })
             .addCase(removeFromCart.fulfilled, (state, action) => {
                 state.isLoading = false;
-                const responseData = action.payload.data || action.payload
-                const existingCartProducts = JSON.parse(localStorage.getItem("CartProduct")) || [];
-
-                let newCart = [];
-                responseData.forEach(product => {
-                    existingCartProducts.forEach(item => {
-                        if (product.product._id === item.product._id) {
-                            newCart.push(item);
-                        }
-                    })
-                });
-                localStorage.setItem("CartProduct", JSON.stringify(newCart));
-                state.CartInformation = newCart
+                const responseData = action.payload.data || action.payload;
+                
+                // Simply update with the response data (server returns updated cart)
+                if (Array.isArray(responseData)) {
+                    localStorage.setItem("CartProduct", JSON.stringify(responseData));
+                    state.CartInformation = responseData;
+                } else {
+                    // Fallback: remove item manually if server doesn't return updated cart
+                    const existingCartProducts = JSON.parse(localStorage.getItem("CartProduct")) || [];
+                    const filteredCart = existingCartProducts.filter(item => 
+                        responseData.some(serverItem => 
+                            (serverItem.product?._id || serverItem._id) === (item.product?._id || item._id)
+                        )
+                    );
+                    localStorage.setItem("CartProduct", JSON.stringify(filteredCart));
+                    state.CartInformation = filteredCart;
+                }
             })
             .addCase(removeFromCart.rejected, (state, action) => {
                 state.isLoading = false;
                 state.isError = true;
                 state.error = action.error?.message;
             })
+            
             // cart reset loading
             .addCase(clearAllCart.pending, (state) => {
                 state.isLoading = true;
@@ -253,5 +254,3 @@ const cartSlice = createSlice({
 export const { setCartInformation, setLoading, clearError, addToLocalCart, updateLocalCartQuantity, removeFromLocalCart, loadLocalCartProducts, openCartModule, closeCartModule, syncCartAfterLogin } = cartSlice.actions;
 
 export default cartSlice.reducer;
-
-
