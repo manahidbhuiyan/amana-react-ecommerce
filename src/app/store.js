@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { apiSlice } from './api/apiSlice.js';
+import { apiSlice } from '../features/api/apiSlice.js';
 
 import locationReducer from '../features/locations/locationSlice'
 import productReducer from "../features/products/productSlice";
@@ -13,8 +13,7 @@ import cartReducer from '../features/cart/cartSlice.js';
 export const store = configureStore({
   reducer: {
     // Add RTK Query
-    api: apiSlice.reducer,
-
+    [apiSlice.reducerPath]: apiSlice.reducer,
     auth: authReducer,
     location: locationReducer,
     products: productReducer,

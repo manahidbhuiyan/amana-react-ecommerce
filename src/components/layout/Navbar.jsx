@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logOutUser } from "../../features/auth/authSlice";
 import { toggleSidebar, resetSidebarSelections } from "../../features/slice/sidebarSlice";
-import { useGetUserInfoQuery, useLogoutUserMutation } from "../../features/auth/authApi";
+import { useGetUserInfoQuery } from "../../features/auth/authApi";
 
 
 const Navbar = () => {
@@ -33,23 +33,23 @@ const Navbar = () => {
   // }, [dispatch, token, userInformation]);
 
   // RTK Query hooks for auth and cart
-  const { 
-    data: userInformation, 
-    isLoading: isUserLoading 
-  } = useGetUserInfoQuery(undefined, {
-    skip: !token // Only fetch if token exists
-  });
+const { 
+  data: userInformation, 
+  isLoading: isUserLoading 
+} = useGetUserInfoQuery(undefined, {
+  skip: !token // Only fetch if token exists
+});
 
-  const [logoutMutation] = useLogoutUserMutation();
-
-  useEffect(() => {
-    if (userInformation && Object.keys(userInformation).length > 0) {
-      setIsLoggedIn(true);
-      navigate("/", { replace: true });
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, [userInformation]);
+useEffect(() => {
+  // Check if userInformation exists and is not loading
+  if (!isUserLoading && userInformation && Object.keys(userInformation).length > 0) {
+    setIsLoggedIn(true);
+  } else if (!isUserLoading && !userInformation && !token) {
+    // Only set isLoggedIn to false if we're not loading, have no user info, and have no token
+    setIsLoggedIn(false);
+  }
+  // Don't navigate here - that could cause unwanted redirects
+}, [userInformation, isUserLoading, token]);
 
   const goProductList = () => {
     const specialOfferCondition = true;
@@ -59,18 +59,10 @@ const Navbar = () => {
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
    const handleSignOut = async () => {
-    try {
-      // Use RTK Query mutation for logout
-      await logoutMutation().unwrap();
-    } catch (error) {
-      console.log('Logout API failed, but clearing local state');
-    } finally {
-      // Always dispatch logout action to clear local state
-      dispatch(logOutUser());
+    dispatch(logOutUser());
       setIsLoggedIn(false);
       setDropdownOpen(false);
       navigate("/signin", { replace: true });
-    }
   };
 
   // Handle logo click - reset sidebar selections and navigate home
@@ -129,11 +121,18 @@ const Navbar = () => {
                       ) : (
                         <div className="pro-pic w-[35px] h-[35px] rounded-full bg-white text-center leading-[35px] shadow-[0_0_10px_2px_rgba(0,0,0,.08)]">
                           {/* Show profile picture if logged in */}
-                          {userInformation.info?.avatar ? (
+                          {/* {userInformation.info?.avatar ? (
                             <img src={userInformation.info.avatar} alt="profile-pic" className="img-fluid rounded-full" />
                           ) : (
                             <img src={profile_image} alt="profile-pic" className="img-fluid rounded-full" />
-                          )}
+                          )} */}
+
+                          {/* Show profile picture if logged in */}
+{userInformation && userInformation.info?.avatar ? (
+  <img src={userInformation.info.avatar} alt="profile-pic" className="img-fluid rounded-full" />
+) : (
+  <img src={profile_image} alt="profile-pic" className="img-fluid rounded-full" />
+)}
                         </div>
                       )}
                     </button>

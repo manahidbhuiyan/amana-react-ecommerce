@@ -1,4 +1,4 @@
-import { apiSlice } from '../../app/api/apiSlice';
+import { apiSlice } from '../api/apiSlice';
 
 // export const loginUserAuth = async (credentials) => {
 //     try {
@@ -32,6 +32,7 @@ import { apiSlice } from '../../app/api/apiSlice';
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+
     // Login mutation
     loginUser: builder.mutation({
       query: (credentials) => ({
@@ -48,7 +49,7 @@ export const authApi = apiSlice.injectEndpoints({
         if (response.token) {
           localStorage.setItem('userToken', response.token);
         }
-        return response;
+        return response.data;
       },
     }),
 
@@ -56,31 +57,36 @@ export const authApi = apiSlice.injectEndpoints({
     getUserInfo: builder.query({
       query: () => '/api/user',
       providesTags: [{ type: 'Auth', id: 'USER_INFO' }],
-      transformResponse: (response) => response.data, // Extract data like your existing API
+      transformResponse: (response) => {
+        console.log("response,",response,)
+        return response
+      } // Extract data like your existing API
     }),
 
     // Logout mutation
-    logoutUser: builder.mutation({
-      query: () => ({
-        url: '/api/user/logout', // If you have logout endpoint
-        method: 'POST',
-      }),
-      invalidatesTags: ['Auth'],
-      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
-        try {
-          await queryFulfilled;
-        } finally {
-          // Clear token regardless of API response
-          localStorage.removeItem('userToken');
-        }
-      },
-    }),
+    // logoutUser: builder.mutation({
+    //   query: () => ({
+    //     url: '/api/user/logout', // If you have logout endpoint
+    //     method: 'POST',
+    //   }),
+    //   invalidatesTags: ['Auth'],
+    //   onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+    //     try {
+    //       await queryFulfilled;
+    //     } finally {
+    //       // Clear token regardless of API response
+    //       localStorage.removeItem('userToken');
+    //     }
+    //   },
+    // }),
   }),
 });
 
-export const {
-  useLoginUserMutation,
-  useGetUserInfoQuery,
-  useLogoutUserMutation,
-  useLazyGetUserInfoQuery, // For manual triggering
-} = authApi;
+// export const {
+//   useLoginUserMutation,
+//   useGetUserInfoQuery,
+//   // useLogoutUserMutation,
+//   useLazyGetUserInfoQuery, // For manual triggering
+// } = authApi;
+
+export const { useLoginUserMutation, useGetUserInfoQuery, useLazyGetUserInfoQuery } = authApi
