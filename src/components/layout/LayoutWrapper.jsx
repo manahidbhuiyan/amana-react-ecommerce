@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { setActiveCategory, setActiveSubCategory } from "../../features/slice/sidebarSlice";
 import { loadLocalCartProducts, setCartInformation } from "../../features/cart/cartSlice";
+import { useAuth } from "../../hooks/useAuth"; 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Location from "./Navbar/Location/Location";
@@ -15,6 +16,9 @@ const LayoutWrapper = ({ children }) => {
   const location = useLocation();
   const locationRef = useRef(null);
   const localSelectArea = localStorage.getItem("selectedArea");
+
+    // Use custom auth hook
+  const { isAuthenticated, user, isProfileLoading } = useAuth();
 
   // Get sidebar state from Redux
   const { isOpen: sidebarOpen, activeCategory, activeSubCategory } = useSelector((state) => state.sidebar);
@@ -60,6 +64,13 @@ const LayoutWrapper = ({ children }) => {
       dispatch(loadLocalCartProducts());
     }
   }, [dispatch]);
+
+    // Cart initialization (existing)
+  useEffect(() => {
+    if (!isAuthenticated) {
+      dispatch(loadLocalCartProducts());
+    }
+  }, [dispatch, isAuthenticated]);
 
   return (
     <div className="bg-sectionBackgroundLight relative">

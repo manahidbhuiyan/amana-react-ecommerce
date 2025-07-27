@@ -2,12 +2,16 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import notFoundImage from "../../assets/images/products/no-image.jpg";
 import { loadProductData } from "../../features/products/productSlice";
-import { addToCart, addToLocalCart, updateCartQuantity, updateLocalCartQuantity, removeFromCart, removeFromLocalCart } from "../../features/cart/cartSlice";
+import { addToLocalCart, updateLocalCartQuantity, removeFromLocalCart } from "../../features/cart/cartSlice";
+import { 
+  useAddToCartMutation, 
+  useUpdateCartQuantityMutation, 
+  useRemoveFromCartMutation 
+} from "../../features/cart/cartApi.js";
 import ProductLoadCard from "../common/ProductLoadCard";
 import { useNavigate } from "react-router-dom";
 import { getImageUrl } from "../../utilis/api";
 import { toast } from "react-toastify";
-
 import { Plus, Minus } from "lucide-react";
 
 // swiper
@@ -24,7 +28,13 @@ const NewProducts = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { newProducts } = useSelector((state) => state.products);
-  const { CartInformation, isLoading } = useSelector((state) => state.cart);
+  const { CartInformation } = useSelector((state) => state.cart);
+
+  // RTK Query mutations
+  const [addToCart, { isLoading: isAddingToCart }] = useAddToCartMutation();
+  const [updateCartQuantity, { isLoading: isUpdatingQuantity }] = useUpdateCartQuantityMutation();
+  const [removeFromCart] = useRemoveFromCartMutation();
+
 
   // Move useMemo to component level - Create cart lookup map
   const cartItemsMap = useMemo(() => {
@@ -83,7 +93,7 @@ const NewProducts = () => {
     let branchId = localStorage.branchId;
 
     if (localStorage.userToken) {
-      dispatch(addToCart({ code, branchId }));
+      addToCart({ code, branchId });
     } else {
       dispatch(addToLocalCart(product));
     }
@@ -97,12 +107,11 @@ const NewProducts = () => {
       const newQuantity = cartItem.quantity + 1;
 
       if (localStorage.userToken) {
-        dispatch(
-          updateCartQuantity({
-            productId: cartItem._id,
-            quantity: newQuantity,
-          })
-        );
+        updateCartQuantity({
+          productId: cartItem._id,
+          quantity: newQuantity,
+          branchId: localStorage.branchId
+        });
       } else {
         dispatch(
           updateLocalCartQuantity({
@@ -136,12 +145,12 @@ const NewProducts = () => {
       const newQuantity = cartItem.quantity - 1;
 
       if (localStorage.userToken) {
-        dispatch(
-          updateCartQuantity({
-            productId: cartItem._id,
-            quantity: newQuantity,
-          })
-        );
+        // Use RTK Query mutation
+        updateCartQuantity({
+          productId: cartItem._id,
+          quantity: newQuantity,
+          branchId: localStorage.branchId
+        });
       } else {
         dispatch(
           updateLocalCartQuantity({
@@ -158,7 +167,10 @@ const NewProducts = () => {
    const removeProduct = (item) => {
       const productId = item._id;
       if (localStorage.userToken) {
-        dispatch(removeFromCart({productId}));
+        removeFromCart({
+        productId, 
+        branchId: localStorage.branchId
+      });
       } else {
         dispatch(removeFromLocalCart(productId));
       }
@@ -266,17 +278,18 @@ const NewProducts = () => {
                           {!cartItemsMap.get(product._id) ? (
                             <button
                               onClick={() => add_to_cart(product)}
-                              disabled={isLoading}
+                              disabled={isAddingToCart }
                               className="w-full bg-themeColor text-white text-sm font-medium py-2 rounded hover:bg-[#41b899] disabled:opacity-50"
                             >
                               <i className="fas fa-shopping-basket"></i>
-                              {isLoading ? " Adding..." : " Add To Cart"}
+                              {isAddingToCart  ? " Adding..." : " Add To Cart"}
                             </button>
                           ) : (
                             // Quantity Controls
                             <div className="flex items-center border border-gray-300 rounded-lg">
                               <button
                                 onClick={() => cartQuantityMinus(product)}
+                                disabled={isUpdatingQuantity  }
                                 className="w-1/5 p-3 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50"
                                 // disabled={cartItemsMap.get(product._id)?.quantity <= 1}
                               >
@@ -285,6 +298,7 @@ const NewProducts = () => {
                               <span className="w-3/5 px-4 py-2 border-x border-gray-300 font-medium text-center cursor-pointer">{cartItemsMap.get(product._id)?.quantity || 0}</span>
                               <button
                                 onClick={() => cartQuantityPlus(product)}
+                                disabled={isUpdatingQuantity }
                                 className="w-1/5 p-3 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50"
                                 // disabled={cartItemsMap.get(product._id)?.quantity >= cartItemsMap.get(product._id)?.maxQuantity}
                               >

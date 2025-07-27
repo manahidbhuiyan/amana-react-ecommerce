@@ -3,21 +3,34 @@ import { Heart, ShoppingCart } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { openCartModule } from "../../features/cart/cartSlice";
 import { loadLocalCartProducts, setCartInformation } from "../../features/cart/cartSlice";
+import { useGetCartQuery } from "../../features/cart/cartApi";
 
 const Header = () => {
   const dispatch = useDispatch();
 
+  // Get token from Redux state or localStorage
+  const token = localStorage.getItem("userToken");
+
+  // Use RTK Query to fetch cart data when user is logged in
+  const { data: cartData, isLoading: isCartLoading } = useGetCartQuery(
+    localStorage.branchId,
+    { skip: !token } // Skip this query if no token exists
+  );
+
   useEffect(() => {
-    if (localStorage.userToken) {
+    if (token) {
+      // When cart data is fetched via RTK Query, it's saved to localStorage
+      // Just update the state from localStorage
       dispatch(setCartInformation());
     } else {
+      // For guest users, load from local storage as before
       dispatch(loadLocalCartProducts());
     }
-  }, [dispatch]);
+  }, [dispatch, cartData, token]); // Add cartData and token as dependencies
 
   const CartInformation = useSelector((state) => state.cart.CartInformation);
 
-  // Fix 1: typo correction + ensure it's always array
+  // Ensure it's always array
   const cartItems = Array.isArray(CartInformation) ? CartInformation : [];
   const cartTotalItem = cartItems.length;
 
@@ -45,14 +58,14 @@ const Header = () => {
         <div className="flex items-center space-x-2">
           <div className="relative">
             <ShoppingCart className="w-6 h-6 text-gray-600 group-hover:text-themeColor" />
-            <span className="absolute -top-2 -right-2 bg-themeColor text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">{cartTotalItem}</span>
+            <span className="absolute -top-2 -right-2 bg-themeColor text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">{isCartLoading ? "..." : cartTotalItem}</span>
           </div>
           <span className="text-gray-700 font-medium group-hover:text-themeColor">Cart</span>
         </div>
 
         {/* Price badge */}
         <div className="bg-green-50 border border-green-200 px-2 py-1 rounded-md">
-          <span className="text-themeColor font-semibold text-sm">৳{cartTotalPrice} </span>
+          <span className="text-themeColor font-semibold text-sm">৳{isCartLoading ? "..." : cartTotalPrice} </span>
         </div>
       </div>
     </div>

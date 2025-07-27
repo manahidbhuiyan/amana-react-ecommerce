@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { loginUserAuth, getuserInfo } from "./authApi.js";
+import { createSlice } from "@reduxjs/toolkit";
+import { authApi } from "./authApi.js";
 
 const initialState = {
   user: null,
@@ -9,26 +9,6 @@ const initialState = {
   userInformation: null,
   error: "",
 };
-
-// user loggedIn
-export const signInUser = createAsyncThunk("auth/signInUser", async (credentials, { rejectWithValue }) => {
-  try {
-    const response = await loginUserAuth(credentials);
-
-    if (response.token) {
-      localStorage.setItem("userToken", response.token);
-    }
-    return response;
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || "Login failed");
-  }
-});
-
-// Load user
-export const loadUser = createAsyncThunk("auth/loadUser", async () => {
-  const user = await getuserInfo();
-  return user.data;
-});
 
 const authSlice = createSlice({
   name: "auth",
@@ -43,49 +23,70 @@ const authSlice = createSlice({
       state.userInformation = null;
       localStorage.removeItem("userToken");
     },
+    clearError(state) {
+      state.error = "";
+      state.isError = false;
+    },
+    setToken(state, action) {
+      state.token = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(signInUser.pending, (state) => {
-        state.isLoading = true;
-        state.isError = false;
-        state.error = "";
-        state.userInformation = null;
-      })
-      .addCase(signInUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.user = action.payload;
-        state.token = action.payload?.token || null;
-        // Store token in localStorage
-        if (action.payload?.token) {
-          localStorage.setItem("userToken", action.payload.token);
+      // Handle login with RTK Query
+      .addMatcher(
+        authApi.endpoints.loginUser.matchPending,
+        (state) => {
+          state.isLoading = true;
+          state.isError = false;
+          state.error = "";
         }
-      })
-      .addCase(signInUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isError = true;
-        state.error = action.payload;
-      });
+      )
+      .addMatcher(
+        authApi.endpoints.loginUser.matchFulfilled,
+        (state, action) => {
+          state.isLoading = false;
+          state.user = action.payload;
+          state.token = action.payload?.token || null;
+          state.isError = false;
+          state.error = "";
+        }
+      )
+      .addMatcher(
+        authApi.endpoints.loginUser.matchRejected,
+        (state, action) => {
+          state.isLoading = false;
+          state.isError = true;
+          state.error = action.error.message || "Login failed";
+        }
+      )
 
-    builder
-      // Add these new cases for loadUser
-      .addCase(loadUser.pending, (state) => {
-        state.isLoading = true;
-        state.isError = false;
-        state.error = "";
-      })
-      .addCase(loadUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.userInformation = action.payload;
-      })
-      .addCase(loadUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isError = true;
-        state.error = action.payload;
-      });
+
+    // Handle getUserInfo with RTK Query
+      .addMatcher(
+        authApi.endpoints.getUserInfo.matchPending,
+        (state) => {
+          state.isLoading = true;
+        }
+      )
+      .addMatcher(
+        authApi.endpoints.getUserInfo.matchFulfilled,
+        (state, action) => {
+          state.isLoading = false;
+          state.userInformation = action.payload;
+        }
+      )
+      .addMatcher(
+        authApi.endpoints.getUserInfo.matchRejected,
+        (state, action) => {
+          state.isLoading = false;
+          state.isError = true;
+          state.error = action.error.message || "Failed to load user info";
+        }
+      );
   },
 });
 
-export const { setSelectedArea, logOutUser } = authSlice.actions; 
+export const { setSelectedArea, logOutUser, clearError, setToken } = authSlice.actions; 
 
 export default authSlice.reducer;

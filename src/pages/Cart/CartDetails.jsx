@@ -1,16 +1,24 @@
 import React, { useMemo } from "react";
-import { useSelector } from "react-redux";
-// import notFoundThumb from "../../assets/images/noImageThumbnail.png";
-import notFoundThumb from "../../assets/images/noImageThumbnail2.jpg";
-import { useDispatch } from "react-redux";
-import { closeCartModule, clearAllCart } from "../../features/cart/cartSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { closeCartModule } from "../../features/cart/cartSlice";
+import { updateLocalCartQuantity, removeFromLocalCart } from "../../features/cart/cartSlice";
+import { 
+  useUpdateCartQuantityMutation, 
+  useRemoveFromCartMutation,
+  useClearCartMutation 
+} from "../../features/cart/cartApi.js";
 import { Truck } from "lucide-react";
 import { toast } from "react-toastify";
-import { updateCartQuantity, updateLocalCartQuantity, removeFromCart, removeFromLocalCart } from "../../features/cart/cartSlice";
+import notFoundThumb from "../../assets/images/noImageThumbnail2.jpg";
 
 const Cart = () => {
   const dispatch = useDispatch();
   const { CartInformation } = useSelector((state) => state.cart);
+
+    // RTK Query mutations
+  const [updateCartQuantity] = useUpdateCartQuantityMutation();
+  const [removeFromCart] = useRemoveFromCartMutation();
+  const [clearCart] = useClearCartMutation();
 
   // Helper function to get price value
   const getPrice = (priceData) => {
@@ -41,8 +49,14 @@ const Cart = () => {
   const finalTotal = subtotal + vatTotal - discountTotal;
   const totalItems = CartInformation?.length || 0;
 
-  const cartClear = () => {
-    dispatch(clearAllCart());
+ const cartClear = () => {
+    if (localStorage.userToken) {
+      clearCart(localStorage.branchId);
+    } else {
+      // For local cart, maintain the existing behavior
+      dispatch(removeFromLocalCart(null)); // This should clear all local cart items
+      localStorage.removeItem("localCartProduct");
+    }
   };
 
   const handleCartClick = () => {
@@ -67,9 +81,7 @@ const Cart = () => {
 
   // Helper function to check if product is in cart
   const checkProductToCart = (item) => {
-    const product = item
-    const productId = item._id
-    return cartItemsMap.get(product._id) || null;
+    return cartItemsMap.get(item._id) || null;
   };
 
   // Quantity increase function
@@ -80,12 +92,11 @@ const Cart = () => {
       const newQuantity = cartItem.quantity + 1;
 
       if (localStorage.userToken) {
-        dispatch(
-          updateCartQuantity({
-            productId: cartItem._id,
-            quantity: newQuantity,
-          })
-        );
+        updateCartQuantity({
+          productId: cartItem._id,
+          quantity: newQuantity,
+          branchId: localStorage.branchId
+        });
       } else {
         dispatch(
           updateLocalCartQuantity({
@@ -119,12 +130,11 @@ const Cart = () => {
       const newQuantity = cartItem.quantity - 1;
 
       if (localStorage.userToken) {
-        dispatch(
-          updateCartQuantity({
-            productId: cartItem._id,
-            quantity: newQuantity,
-          })
-        );
+        updateCartQuantity({
+          productId: cartItem._id,
+          quantity: newQuantity,
+          branchId: localStorage.branchId
+        });
       } else {
         dispatch(
           updateLocalCartQuantity({
@@ -141,7 +151,10 @@ const Cart = () => {
   const removeProduct = (item) => {
     const productId = item._id;
     if (localStorage.userToken) {
-      dispatch(removeFromCart({ productId }));
+      removeFromCart({ 
+        productId,
+        branchId: localStorage.branchId 
+      });
     } else {
       dispatch(removeFromLocalCart(productId));
     }

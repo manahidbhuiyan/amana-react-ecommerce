@@ -6,9 +6,10 @@ import Location from "./Navbar/Location/Location";
 import Cart from "../common/Cart";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { loadUser, logOutUser } from "../../features/auth/authSlice";
+import { logOutUser } from "../../features/auth/authSlice";
 import { toggleSidebar, resetSidebarSelections } from "../../features/slice/sidebarSlice";
-import { openCartModule } from "../../features/cart/cartSlice";
+import { useGetUserInfoQuery, useLogoutUserMutation } from "../../features/auth/authApi";
+
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -16,15 +17,30 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const { userInformation, token } = useSelector((state) => state.auth);
+  // Get token from Redux state
+  const { token } = useSelector((state) => state.auth);
   const { specialOffers } = useSelector((state) => state.products);
   const specialOfferCount = specialOffers.count;
 
-  useEffect(() => {
-    if (token && !userInformation) {
-      dispatch(loadUser());
-    }
-  }, [dispatch, token, userInformation]);
+  // const { userInformation, token } = useSelector((state) => state.auth);
+  // const { specialOffers } = useSelector((state) => state.products);
+  // const specialOfferCount = specialOffers.count;
+
+  // useEffect(() => {
+  //   if (token && !userInformation) {
+  //     dispatch(loadUser());
+  //   }
+  // }, [dispatch, token, userInformation]);
+
+  // RTK Query hooks for auth and cart
+  const { 
+    data: userInformation, 
+    isLoading: isUserLoading 
+  } = useGetUserInfoQuery(undefined, {
+    skip: !token // Only fetch if token exists
+  });
+
+  const [logoutMutation] = useLogoutUserMutation();
 
   useEffect(() => {
     if (userInformation && Object.keys(userInformation).length > 0) {
@@ -41,11 +57,20 @@ const Navbar = () => {
   };
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
-  const handleSignOut = () => {
-    dispatch(logOutUser());
-    setIsLoggedIn(false);
-    setDropdownOpen(false);
-    navigate("/signin", { replace: true });
+
+   const handleSignOut = async () => {
+    try {
+      // Use RTK Query mutation for logout
+      await logoutMutation().unwrap();
+    } catch (error) {
+      console.log('Logout API failed, but clearing local state');
+    } finally {
+      // Always dispatch logout action to clear local state
+      dispatch(logOutUser());
+      setIsLoggedIn(false);
+      setDropdownOpen(false);
+      navigate("/signin", { replace: true });
+    }
   };
 
   // Handle logo click - reset sidebar selections and navigate home
@@ -85,7 +110,7 @@ const Navbar = () => {
 
             {/* Header Right */}
             <div className="w-2/5 flex items-center text-right justify-end gap-5 header-bottom-col">
-              <Cart ></Cart>
+              <Cart></Cart>
               <Location></Location>
 
               <div className="profile-button min-w-[35px] 2md:min-w[65px]">
