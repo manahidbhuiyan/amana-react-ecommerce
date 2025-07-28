@@ -61,7 +61,6 @@ const authSlice = createSlice({
         }
       )
 
-
     // Handle getUserInfo with RTK Query
       .addMatcher(
         authApi.endpoints.getUserInfo.matchPending,

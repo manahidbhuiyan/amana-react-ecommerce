@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logOutUser } from "../../features/auth/authSlice";
 import { toggleSidebar, resetSidebarSelections } from "../../features/slice/sidebarSlice";
 import { useGetUserInfoQuery } from "../../features/auth/authApi";
-
+import { authApi } from "../../features/auth/authApi";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -22,34 +22,21 @@ const Navbar = () => {
   const { specialOffers } = useSelector((state) => state.products);
   const specialOfferCount = specialOffers.count;
 
-  // const { userInformation, token } = useSelector((state) => state.auth);
-  // const { specialOffers } = useSelector((state) => state.products);
-  // const specialOfferCount = specialOffers.count;
-
-  // useEffect(() => {
-  //   if (token && !userInformation) {
-  //     dispatch(loadUser());
-  //   }
-  // }, [dispatch, token, userInformation]);
-
   // RTK Query hooks for auth and cart
-const { 
-  data: userInformation, 
-  isLoading: isUserLoading 
-} = useGetUserInfoQuery(undefined, {
-  skip: !token // Only fetch if token exists
-});
+  const { data: userInformation, isLoading: isUserLoading } = useGetUserInfoQuery(undefined, {
+    skip: !token, // Only fetch if token exists
+  });
 
-useEffect(() => {
-  // Check if userInformation exists and is not loading
-  if (!isUserLoading && userInformation && Object.keys(userInformation).length > 0) {
-    setIsLoggedIn(true);
-  } else if (!isUserLoading && !userInformation && !token) {
-    // Only set isLoggedIn to false if we're not loading, have no user info, and have no token
-    setIsLoggedIn(false);
-  }
-  // Don't navigate here - that could cause unwanted redirects
-}, [userInformation, isUserLoading, token]);
+  useEffect(() => {
+    // Check if userInformation exists and is not loading
+    if (!isUserLoading && userInformation && Object.keys(userInformation).length > 0) {
+      setIsLoggedIn(true);
+      setDropdownOpen(false);
+    } else if (!isUserLoading && !userInformation && !token) {
+      // Only set isLoggedIn to false if we're not loading, have no user info, and have no token
+      setIsLoggedIn(false);
+    }
+  }, [userInformation, isUserLoading, token]);
 
   const goProductList = () => {
     const specialOfferCondition = true;
@@ -58,15 +45,30 @@ useEffect(() => {
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
-   const handleSignOut = async () => {
-    dispatch(logOutUser());
+  const handleSignOut = async () => {
+    try {
+      // Update local component state
       setIsLoggedIn(false);
       setDropdownOpen(false);
-      navigate("/signin", { replace: true });
-  };
 
+      // Clear Redux auth state
+      dispatch(logOutUser());
+
+      // Clear RTK Query cache for auth endpoints
+      dispatch(authApi.util.resetApiState());
+
+      // 4. Alternative: Force remove specific cache entry
+      dispatch(authApi.util.upsertQueryData("getUserInfo", undefined, null));
+
+      // Navigate to signin page
+      navigate("/signin", { replace: true });
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
   // Handle logo click - reset sidebar selections and navigate home
   const handleLogoClick = () => {
+    setDropdownOpen(false);
     dispatch(resetSidebarSelections());
     navigate("/", { replace: true });
   };
@@ -75,10 +77,6 @@ useEffect(() => {
   const handleAllCategoriesClick = () => {
     dispatch(toggleSidebar());
   };
-
-  // const cartOpen = () =>{
-  //   dispatch(openCartModule())
-  // }
 
   return (
     <div>
@@ -121,18 +119,11 @@ useEffect(() => {
                       ) : (
                         <div className="pro-pic w-[35px] h-[35px] rounded-full bg-white text-center leading-[35px] shadow-[0_0_10px_2px_rgba(0,0,0,.08)]">
                           {/* Show profile picture if logged in */}
-                          {/* {userInformation.info?.avatar ? (
+                          {userInformation && userInformation.info?.avatar ? (
                             <img src={userInformation.info.avatar} alt="profile-pic" className="img-fluid rounded-full" />
                           ) : (
                             <img src={profile_image} alt="profile-pic" className="img-fluid rounded-full" />
-                          )} */}
-
-                          {/* Show profile picture if logged in */}
-{userInformation && userInformation.info?.avatar ? (
-  <img src={userInformation.info.avatar} alt="profile-pic" className="img-fluid rounded-full" />
-) : (
-  <img src={profile_image} alt="profile-pic" className="img-fluid rounded-full" />
-)}
+                          )}
                         </div>
                       )}
                     </button>
@@ -152,7 +143,6 @@ useEffect(() => {
                         <a href="#" className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] ">
                           <i className="text-font-14 hover:text-themeColor fas fa-user-times mr-1"></i> Delete Account
                         </a>
-                        {/* <div className="dropdown-divider my-2"></div> */}
                         <a
                           href="#"
                           className="dropdown-item block px-4 py-2 text-left items-center text-font-14 text-gray-700 hover:text-themeColor hover:bg-[#f8f9fa] border-t border-t-[#e9ecef]"

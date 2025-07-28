@@ -35,7 +35,15 @@ const SignInComponent = () => {
         password: credentials.password,
       });
 
-      toast.success("Login successful!");
+      toast.success(<div>Login successful</div>, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
       navigate("/");
     } catch (error) {
       console.error("Login error:", error);
@@ -51,7 +59,7 @@ const SignInComponent = () => {
   }, [error]);
 
   return (
-    <div className="w-full bg-[#F8F5F5] pt-14 pb-14 ">
+    <div className="w-full bg-[#F8F5F5] pb-14 ">
       <div className="w-full md:w-[400px] lg:w-[500px] mt-[100px] mx-3 md:mx-auto bg-white p-6 rounded shadow-[0_0_4px_2px_rgba(0,0,0,0.03)] ">
         <h2 className="text-center text-xl font-semibold text-gray-800 mb-6">SIGN IN HERE</h2>
 
@@ -62,12 +70,7 @@ const SignInComponent = () => {
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-gray-400"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                 </svg>
               </div>
@@ -90,17 +93,8 @@ const SignInComponent = () => {
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-gray-400"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                    clipRule="evenodd"
-                  />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                 </svg>
               </div>
               <input
@@ -118,21 +112,12 @@ const SignInComponent = () => {
 
           <div className="mb-6">
             <label className="inline-flex items-center">
-              <input
-                type="checkbox"
-                name="rememberMe"
-                className="border-gray-300 rounded text-green-600 focus:ring-green-500"
-                onChange={handleChange}
-                value={credentials.rememberMe}
-              />
+              <input type="checkbox" name="rememberMe" className="border-gray-300 rounded text-green-600 focus:ring-green-500" onChange={handleChange} value={credentials.rememberMe} />
               <span className="ml-2 text-gray-700">Remember Me</span>
             </label>
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-pink-400 hover:bg-pink-500 text-white py-2 px-4 rounded transition duration-200"
-          >
+          <button type="submit" className="w-full bg-pink-400 hover:bg-pink-500 text-white py-2 px-4 rounded transition duration-200">
             SIGN IN
           </button>
         </form>

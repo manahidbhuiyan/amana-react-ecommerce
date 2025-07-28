@@ -1,34 +1,5 @@
 import { apiSlice } from '../api/apiSlice';
 
-// export const loginUserAuth = async (credentials) => {
-//     try {
-//         const response = await axios.post("/api/user/login", {
-//             email: credentials.email,
-//             password: credentials.password
-//         });
-//         return response.data;
-//     } catch (error) {
-//         console.log(error);
-//         throw error; // Re-throw to handle in the thunk
-//     }
-// }
-
-// export const getuserInfo = async() =>{
-//     try{
-//         if (localStorage.userToken) {
-//             setAuthToken(localStorage.userToken)
-//           }
-        
-//         const response = await axios.get("/api/user")
-//         return response
-//     }
-//     catch(error){
-//         console.log(error);
-//         throw error;
-//     }
-// }
-
-
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -45,11 +16,11 @@ export const authApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'Auth' }],
       transformResponse: (response) => {
-        // Save token to localStorage automatically
+        console.log("response",response)
         if (response.token) {
           localStorage.setItem('userToken', response.token);
         }
-        return response.data;
+        return response;
       },
     }),
 
@@ -63,30 +34,8 @@ export const authApi = apiSlice.injectEndpoints({
       } // Extract data like your existing API
     }),
 
-    // Logout mutation
-    // logoutUser: builder.mutation({
-    //   query: () => ({
-    //     url: '/api/user/logout', // If you have logout endpoint
-    //     method: 'POST',
-    //   }),
-    //   invalidatesTags: ['Auth'],
-    //   onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
-    //     try {
-    //       await queryFulfilled;
-    //     } finally {
-    //       // Clear token regardless of API response
-    //       localStorage.removeItem('userToken');
-    //     }
-    //   },
-    // }),
   }),
 });
 
-// export const {
-//   useLoginUserMutation,
-//   useGetUserInfoQuery,
-//   // useLogoutUserMutation,
-//   useLazyGetUserInfoQuery, // For manual triggering
-// } = authApi;
 
 export const { useLoginUserMutation, useGetUserInfoQuery, useLazyGetUserInfoQuery } = authApi
