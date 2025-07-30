@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { loadProductSingleData } from "../../features/products/productSlice";
+// import { loadProductSingleData } from "../../features/products/productSlice";
 import { ChevronLeft, ChevronRight, ShoppingCart, Plus, Minus, Star, Heart, Share2, Truck, Shield, RotateCcw } from "lucide-react";
 import notFoundImage from "../../assets/images/products/no-image.jpg";
 import { useNavigate } from "react-router-dom";
@@ -43,9 +43,9 @@ const ProductDetails = () => {
   // FIX 1: Add all dependencies to useEffect
   useEffect(() => {
     window.scrollTo({top: 0, behavior: 'smooth'});
-    if (branchId && slug && barcode) {
-      dispatch(loadProductSingleData({ branchId, slug, barcode }));
-    }
+    // if (branchId && slug && barcode) {
+    //   dispatch(loadProductSingleData({ branchId, slug, barcode }));
+    // }
   }, [dispatch, branchId, slug, barcode]); // Added missing dependencies
 
   useEffect(() => {

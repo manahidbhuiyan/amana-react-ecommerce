@@ -6,6 +6,9 @@ export const productApi = apiSlice.injectEndpoints({
             query: ({ pageNo, branchID, queryString = {} }) => {
                 let searchQuery = '';
 
+                console.log("pageNo",pageNo)
+                console.log("branchID",branchID)
+
                 for (const key in queryString) {
                     if (
                         queryString[key] !== undefined &&
@@ -15,7 +18,12 @@ export const productApi = apiSlice.injectEndpoints({
                         searchQuery += `&${key}=${encodeURIComponent(queryString[key])}`;
                     }
                 }
-                return `/api/product/lists/${pageNo}?branch=${branchID}${searchQuery}`
+                console.log("queryString",queryString)
+
+                let api = `/api/product/lists/${pageNo}?branch=${branchID}${searchQuery}`
+                console.log("api",api)
+
+                return api
             },
             providesTags: (result, error, { pageNo, branchID }) => [
                 { type: 'Product', id: `LIST-${branchID}-${pageNo}` },
@@ -28,7 +36,7 @@ export const productApi = apiSlice.injectEndpoints({
     })
 })
 
-export const { usegetProductsQuery, useLazygetProductsQuery } = productApi
+export const { useGetProductsQuery, useLazyGetProductsQuery } = productApi
 
 
 // getUserInfo: builder.query({

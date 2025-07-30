@@ -16,7 +16,6 @@ export const authApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'Auth' }],
       transformResponse: (response) => {
-        console.log("response",response)
         if (response.token) {
           localStorage.setItem('userToken', response.token);
         }
@@ -29,7 +28,6 @@ export const authApi = apiSlice.injectEndpoints({
       query: () => '/api/user',
       providesTags: [{ type: 'Auth', id: 'USER_INFO' }],
       transformResponse: (response) => {
-        console.log("response,",response,)
         return response
       } // Extract data like your existing API
     }),

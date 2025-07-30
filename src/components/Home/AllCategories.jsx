@@ -1,24 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { loadCategoryData } from "../../features/categories/categoriesSlice";
+import { useGetCategoryQuery } from "../../features/categories/categoriesApi";
 import "./AllCategories.css";
 import { getImageUrl } from "../../utilis/api";
 
-
 const AllCategories = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  
+  // Fetch categories on component mount
+  const branchId = localStorage.getItem('branchId') || '';
+  const { data: CategoriesData, isLoading, isError } = useGetCategoryQuery(branchId);
+
   // Redux state
-  const { CategoriesData, isLoading, isError } = useSelector((state) => state.categories);
+  // const { CategoriesData, isLoading, isError } = useSelector((state) => state.categories);
   const topCategories = CategoriesData;
 
-  // Fetch categories on component mount
-  useEffect(() => {
-    let branchId = localStorage.branchId;
-    dispatch(loadCategoryData({ branchId }));
-  }, [dispatch]);
+
 
   // Handle navigation to products page
   const redirectToProducts = (categoryName) => {

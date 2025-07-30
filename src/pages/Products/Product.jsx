@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import notFoundImage from "../../assets/images/products/no-image.jpg";
 import { useSelector, useDispatch } from "react-redux";
 import redRibbon from "../../assets/images/red-ribbon.png";
-import { loadProductData, pushProductInformation, clearProductList } from "../../features/products/productSlice";
+// import { loadProductData, pushProductInformation, clearProductList } from "../../features/products/productSlice";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -21,7 +21,7 @@ const Product = () => {
 
   useEffect(() => {
     setHasMore(true);
-    dispatch(clearProductList());
+    // dispatch(clearProductList());
     if (productList.count <= 0) {
       infinateHandler();
     }
@@ -34,13 +34,13 @@ const Product = () => {
       let branchId = localStorage.branchId;
       try {
         console.log("page before", page.current);
-        const result = await dispatch(
-          loadProductData({
-            pageNo: page.current,
-            branchId: branchId,
-            queryString,
-          })
-        );
+        // const result = await dispatch(
+        //   loadProductData({
+        //     pageNo: page.current,
+        //     branchId: branchId,
+        //     queryString,
+        //   })
+        // );
 
         if (result.payload && result.payload.products && result.payload.products.data) {
           const newProducts = result.payload.products.data.filter((obj) => obj.quantity >= 1);

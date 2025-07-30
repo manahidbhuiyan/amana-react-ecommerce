@@ -10,6 +10,7 @@ import { logOutUser } from "../../features/auth/authSlice";
 import { toggleSidebar, resetSidebarSelections } from "../../features/slice/sidebarSlice";
 import { useGetUserInfoQuery } from "../../features/auth/authApi";
 import { authApi } from "../../features/auth/authApi";
+import { useGetProductsQuery } from "../../features/products/productApi";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -19,7 +20,14 @@ const Navbar = () => {
 
   // Get token from Redux state
   const { token } = useSelector((state) => state.auth);
-  const { specialOffers } = useSelector((state) => state.products);
+  const { data: specialOffers } = useGetProductsQuery({
+    pageNo: 1,
+    branchID: localStorage.getItem("branchId") || "",
+    queryString: {
+      specialOffer: true,
+    },
+  });
+
   const specialOfferCount = specialOffers.count;
 
   // RTK Query hooks for auth and cart

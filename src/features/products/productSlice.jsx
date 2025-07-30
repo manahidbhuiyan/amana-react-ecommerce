@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   newProducts: [],
@@ -43,15 +43,18 @@ const productSlice = createSlice({
   initialState,
   reducers: {
     setNewProducts(state, action) {
+      console.log("action", action.payload);
       state.newProducts = action.payload.map(transformProductData);
     },
     setSpecialOffers(state, action) {
+      console.log("action", action.payload);
       state.specialOffers = action.payload.map(transformProductData);
+      console.log("action specialOffers", state.specialOffers);
     },
     setSingleProduct(state, action) {
       state.singleProduct = transformProductData(action.payload);
     },
-     setProductList(state, action) {
+    setProductList(state, action) {
       const products = action.payload?.data || [];
       const count = action.payload?.count || products.length;
       state.productList = {
@@ -162,16 +165,6 @@ const productSlice = createSlice({
   // },
 });
 
-export const {
-  setNewProducts,
-  setSpecialOffers,
-  setSingleProduct,
-  setProductList,
-  pushProductInformation,
-  clearProductList,
-  setLoading,
-  setError,
-  clearError,
-} = productSlice.actions;
+export const { setNewProducts, setSpecialOffers, setSingleProduct, setProductList, pushProductInformation, clearProductList, setLoading, setError, clearError } = productSlice.actions;
 
 export default productSlice.reducer;

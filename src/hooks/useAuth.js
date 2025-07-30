@@ -21,9 +21,7 @@ export const useAuth = () => {
   // Login function
   const login = async (credentials) => {
     try {
-      console.log("credentials", credentials);
       const result = await loginMutation(credentials).unwrap();
-      // dispatch(authApi.util.invalidateTags([{ type: "Auth", id: "USER_INFO" }]));
       return result;
     } catch (error) {
       throw error;
