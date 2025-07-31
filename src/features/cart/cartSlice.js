@@ -99,6 +99,11 @@ const cartSlice = createSlice({
             localStorage.setItem("localCartProduct", JSON.stringify(filteredCartProducts));
             state.CartInformation = filteredCartProducts;
         },
+        //clearAllFromLocalCart
+        clearAllFromLocalCart(state) {
+            localStorage.removeItem('localCartProduct')
+            state.CartInformation = []
+        },
         // Load from localStorage to Redux (for app initialization)
         loadLocalCartProducts(state) {
             const existingCartProducts = JSON.parse(localStorage.getItem("localCartProduct")) || [];
@@ -252,17 +257,18 @@ const cartSlice = createSlice({
 
 // export const { setCartInformation, setLoading, clearError, addToLocalCart, updateLocalCartQuantity, removeFromLocalCart, loadLocalCartProducts, openCartModule, closeCartModule, syncCartAfterLogin } = cartSlice.actions;
 
-export const { 
-    setCartInformation, 
-    setLoading, 
-    clearError, 
-    addToLocalCart, 
-    updateLocalCartQuantity, 
-    removeFromLocalCart, 
-    loadLocalCartProducts, 
-    openCartModule, 
-    closeCartModule, 
-    syncCartAfterLogin 
+export const {
+    setCartInformation,
+    setLoading,
+    clearError,
+    addToLocalCart,
+    updateLocalCartQuantity,
+    removeFromLocalCart,
+    clearAllFromLocalCart,
+    loadLocalCartProducts,
+    openCartModule,
+    closeCartModule,
+    syncCartAfterLogin
 } = cartSlice.actions;
 export default cartSlice.reducer;
 

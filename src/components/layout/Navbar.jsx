@@ -28,7 +28,7 @@ const Navbar = () => {
     },
   });
 
-  const specialOfferCount = specialOffers.count;
+  const specialOfferCount = specialOffers?.count;
 
   // RTK Query hooks for auth and cart
   const { data: userInformation, isLoading: isUserLoading } = useGetUserInfoQuery(undefined, {

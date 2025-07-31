@@ -39,8 +39,7 @@ const NewProducts = () => {
   const { 
     data: productsData, 
     isLoading, 
-    error,
-    refetch 
+    error 
   } = useGetProductsQuery({
     pageNo: 1,
     branchID: localStorage.getItem('branchId') || '', // ✅ Safe way to get localStorage

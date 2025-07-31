@@ -1,12 +1,8 @@
 import React, { useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { closeCartModule } from "../../features/cart/cartSlice";
-import { updateLocalCartQuantity, removeFromLocalCart } from "../../features/cart/cartSlice";
-import { 
-  useUpdateCartQuantityMutation, 
-  useRemoveFromCartMutation,
-  useClearCartMutation 
-} from "../../features/cart/cartApi.js";
+import { updateLocalCartQuantity, removeFromLocalCart, clearAllFromLocalCart } from "../../features/cart/cartSlice";
+import { useUpdateCartQuantityMutation, useRemoveFromCartMutation, useClearCartMutation } from "../../features/cart/cartApi.js";
 import { Truck } from "lucide-react";
 import { toast } from "react-toastify";
 import notFoundThumb from "../../assets/images/noImageThumbnail2.jpg";
@@ -15,7 +11,7 @@ const Cart = () => {
   const dispatch = useDispatch();
   const { CartInformation } = useSelector((state) => state.cart);
 
-    // RTK Query mutations
+  // RTK Query mutations
   const [updateCartQuantity] = useUpdateCartQuantityMutation();
   const [removeFromCart] = useRemoveFromCartMutation();
   const [clearCart] = useClearCartMutation();
@@ -49,13 +45,17 @@ const Cart = () => {
   const finalTotal = subtotal + vatTotal - discountTotal;
   const totalItems = CartInformation?.length || 0;
 
- const cartClear = () => {
+  const cartClear = () => {
+    console.log("clicked for clear");
     if (localStorage.userToken) {
+      console.log("api for clear");
+
       clearCart(localStorage.branchId);
     } else {
+      console.log("local for clear");
       // For local cart, maintain the existing behavior
-      dispatch(removeFromLocalCart(null)); // This should clear all local cart items
-      localStorage.removeItem("localCartProduct");
+      dispatch(clearAllFromLocalCart()); // This should clear all local cart items
+      // localStorage.removeItem("localCartProduct");
     }
   };
 
@@ -64,13 +64,13 @@ const Cart = () => {
   };
 
   // Move useMemo to component level - Create cart lookup map
- const cartItemsMap = useMemo(() => {
+  const cartItemsMap = useMemo(() => {
     const map = new Map();
-    
+
     if (CartInformation && Array.isArray(CartInformation)) {
       CartInformation.forEach((item) => {
         const productId = item._id;
-        
+
         if (productId) {
           map.set(productId, item);
         }
@@ -95,7 +95,7 @@ const Cart = () => {
         updateCartQuantity({
           productId: cartItem._id,
           quantity: newQuantity,
-          branchId: localStorage.branchId
+          branchId: localStorage.branchId,
         });
       } else {
         dispatch(
@@ -133,7 +133,7 @@ const Cart = () => {
         updateCartQuantity({
           productId: cartItem._id,
           quantity: newQuantity,
-          branchId: localStorage.branchId
+          branchId: localStorage.branchId,
         });
       } else {
         dispatch(
@@ -151,9 +151,9 @@ const Cart = () => {
   const removeProduct = (item) => {
     const productId = item._id;
     if (localStorage.userToken) {
-      removeFromCart({ 
+      removeFromCart({
         productId,
-        branchId: localStorage.branchId 
+        branchId: localStorage.branchId,
       });
     } else {
       dispatch(removeFromLocalCart(productId));
@@ -185,7 +185,7 @@ const Cart = () => {
           <>
             {/* Delivery Info Banner */}
             <div className="mt-2 mx-4 py-1 px-2 bg-green-50 rounded-lg border border-green-200">
-              <div className="flex items-center gap-2 text-green-700">
+              <div className="flex items-center gap-2 text-themeColor">
                 <Truck size={16} />
                 <span className="text-sm font-medium">
                   {subtotal < 500 ? (
@@ -217,15 +217,27 @@ const Cart = () => {
                       />
                       <div className="flex-1 min-w-0">
                         <h5 className="text-xs font-medium text-gray-800 truncate">{item?.name}</h5>
-                        <p className="text-xs text-gray-600">
+                        <div className="flex justify-start items-center space-x-2">
+                          <div className="flex items-center border border-gray-300 rounded">
+                            <button className="px-1.5 py-0.5 hover:bg-gray-100 text-gray-600 text-xs" onClick={() => cartQuantityMinus(item)}>
+                              <i className="fas fa-minus"></i>
+                            </button>
+                            <input type="text" value={item.quantity} className="w-8 text-center border-0 outline-none text-xs" readOnly />
+                            <button className="px-1.5 py-0.5 hover:bg-gray-100 text-gray-600 text-xs" onClick={() => cartQuantityPlus(item)}>
+                              <i className="fas fa-plus"></i>
+                            </button>
+                          </div>
+                          <p className="text-font-13 italic text-gray-600">Each - ৳{itemPrice.toFixed(2)} </p>
+                        </div>
+                        {/* <p className="text-xs text-gray-600">
                           ৳{itemPrice.toFixed(2)} x {item.quantity} = ৳{itemTotal}
-                        </p>
+                        </p> */}
                       </div>
 
                       {/* Quantity Controls & Delete - Converted from Vue */}
                       <div className="flex items-end space-x-2">
                         {/* Quantity Controls */}
-                        <div className="flex items-center border border-gray-300 rounded">
+                        {/* <div className="flex items-center border border-gray-300 rounded">
                           <button className="px-1.5 py-0.5 hover:bg-gray-100 text-gray-600 text-xs" onClick={() => cartQuantityMinus(item)}>
                             <i className="fas fa-minus"></i>
                           </button>
@@ -233,7 +245,8 @@ const Cart = () => {
                           <button className="px-1.5 py-0.5 hover:bg-gray-100 text-gray-600 text-xs" onClick={() => cartQuantityPlus(item)}>
                             <i className="fas fa-plus"></i>
                           </button>
-                        </div>
+                        </div> */}
+                        <p className="text-xs text-gray-600">৳{itemTotal}</p>
 
                         {/* Delete Button */}
                         <button className="text-red-500 hover:text-red-700 text-sm" onClick={() => removeProduct(item)}>
@@ -247,7 +260,7 @@ const Cart = () => {
             </div>
 
             {/* Checkout Section - Fixed */}
-            <div className="z-30 relative bottom-[92px] bg-white border-t border-gray-200 p-3">
+            <div className="z-30 relative bottom-[52px] bg-white border-t border-gray-200 p-3">
               {/* Totals */}
               <div className="space-y-1 mb-3">
                 <div className="flex justify-between items-center text-xs">
@@ -273,7 +286,7 @@ const Cart = () => {
 
               <div className="flex justify-between items-center pt-3 border-t">
                 {/* Checkout Button */}
-                <button className=" bg-themeColor text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors">Checkout</button>
+                <button className=" bg-themeColor text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-themeColorLight transition-colors">Checkout</button>
                 <div className="flex flex-end items-center text-sm space-x-1 ">
                   <span className="font-bold">Total:</span>
                   <span>৳{finalTotal.toFixed(2)}</span>
