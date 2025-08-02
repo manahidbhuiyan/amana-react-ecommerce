@@ -40,6 +40,7 @@ const productSlice = createSlice({
       state.singleProduct = transformProductData(action.payload);
     },
     setProductList(state, action) {
+      console.log("action",action)
       const products = action.payload?.data || [];
       const count = action.payload?.count || products.length;
       state.productList = {

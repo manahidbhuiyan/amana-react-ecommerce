@@ -2,73 +2,95 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import notFoundImage from "../../assets/images/products/no-image.jpg";
 import { useSelector, useDispatch } from "react-redux";
 import redRibbon from "../../assets/images/red-ribbon.png";
-// import { loadProductData, pushProductInformation, clearProductList } from "../../features/products/productSlice";
-import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { useGetProductsQuery } from "../../features/products/productApi";
+import { getImageUrl } from "../../utilis/api";
 
 const Product = () => {
   const { search } = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  let page = useRef(1);
+  const page = useRef(1);
   const [hasMore, setHasMore] = useState(true);
+  const [allProducts, setAllProducts] = useState([]);
 
   const queryParams = Object.fromEntries(new URLSearchParams(search));
+  
+  // Move the hook call to the top level
+  const {
+    data: productsData,
+    isLoading,
+    error,
+    refetch
+  } = useGetProductsQuery({
+    pageNo: page.current,
+    branchID: localStorage.getItem("branchId") || "",
+    queryString: queryParams,
+  });
 
-  const { productList } = useSelector((state) => state.products);
-  const products = productList?.data || productList || [];
-
+  // Handle the API response
   useEffect(() => {
-    setHasMore(true);
-    // dispatch(clearProductList());
-    if (productList.count <= 0) {
-      infinateHandler();
-    }
-    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-  }, [dispatch, search]);
+    if (productsData && productsData.data) {
+      console.log("productsData after",productsData.data)
 
-  const infinateHandler = useCallback(async () => {
-    {
-      let queryString = queryParams;
-      let branchId = localStorage.branchId;
-      try {
-        console.log("page before", page.current);
-        // const result = await dispatch(
-        //   loadProductData({
-        //     pageNo: page.current,
-        //     branchId: branchId,
-        //     queryString,
-        //   })
-        // );
+      const newProducts = productsData.data?.filter((product) => {
+        const hasStock = product.quantity >= 1
 
-        if (result.payload && result.payload.products && result.payload.products.data) {
-          const newProducts = result.payload.products.data.filter((obj) => obj.quantity >= 1);
-          if (newProducts.length > 0) {
-            page.current++;
-          } else {
-            setHasMore(false);
-          }
-        }
-      } catch (error) {
-        console.error("Error loading products:", error);
+        const hasImage = product.images && Array.isArray(product.images) && product.images.length > 0 && product.images[0]
+
+        // const isAvailable = product.online_active == true
+
+        return hasStock && hasImage 
+      }) || [];
+
+      console.log("newProducts after",newProducts)
+     
+      
+      if (page.current === 1) {
+        // First page - replace all products
+        setAllProducts(newProducts);
+      } else {
+        // Subsequent pages - append new products
+        setAllProducts(prev => [...prev, ...newProducts]);
+      }
+      
+      // Check if there are more products to load
+      if (newProducts.length === 0) {
         setHasMore(false);
       }
     }
-  }, [dispatch, search]);
+  }, [productsData]);
+
+  // Reset when search changes
+  useEffect(() => {
+    setHasMore(true);
+    page.current = 1;
+    setAllProducts([]);
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  }, [search]);
+
+  // Infinite scroll handler
+  const infinateHandler = useCallback(() => {
+    if (!isLoading && hasMore) {
+      page.current++;
+      refetch(); // Trigger a new query with updated page number
+    }
+  }, [isLoading, hasMore, refetch]);
 
   const moveToProductDetails = (product) => {
     navigate(`/product/${product.category.name}/${product.subcategory.name}/${product.slug}/${product.barcode}`);
   };
 
+  // Use allProducts for rendering instead of products from Redux
+  const displayProducts = allProducts.length > 0 ? allProducts : [];
+
+  console.log("displayProducts",displayProducts)
+
   return (
     <div className="mx-auto px-4 py-4">
-      {/* <div className="bg-gray-300 py-10 px-5 fixed top-32 z-50">
-        <p>Total Products : {productList.count} </p>
-        <p>Products Loaded : {products.length} </p>
-      </div> */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-7">
-        {products.map((product, index) => {
+        {displayProducts.map((product, index) => {
           return (
             <div key={product._id || index} className={`card product-card bg-white shadow-lg rounded-lg overflow-hidden h-[400px]`}>
               <div className="relative">
@@ -81,12 +103,14 @@ const Product = () => {
                   </div>
                 )}
 
-                <img src={notFoundImage} alt="Product Image" className="w-full h-48 object-cover" />
+                <img src={product.images && product.images[0] ? getImageUrl(product.images[0]) : notFoundImage} alt="Product Image" className="w-full h-48 object-cover" />
               </div>
 
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">{product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}</span>
+                  <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">
+                    {product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}
+                  </span>
                 </div>
 
                 <h3
@@ -101,12 +125,18 @@ const Product = () => {
 
                 {product.discount > 0 ? (
                   <div className="flex justify-start gap-3 items-center pt-2">
-                    <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {(product.price.sell - product.discount).toFixed(2)}</div>
-                    <del className="text-gray-400 text-sm leading-normal">Tk. {product.price.sell.toFixed(2)}</del>
+                    <div className="price text-themeColor text-lg font-bold leading-normal">
+                      Tk. {(product.price.sell - product.discount).toFixed(2)}
+                    </div>
+                    <del className="text-gray-400 text-sm leading-normal">
+                      Tk. {product.price.sell.toFixed(2)}
+                    </del>
                   </div>
                 ) : (
                   <div className="flex justify-start gap-2 items-center pt-2">
-                    <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {product.price.sell.toFixed(2)}</div>
+                    <div className="price text-themeColor text-lg font-bold leading-normal">
+                      Tk. {product.price.sell.toFixed(2)}
+                    </div>
                   </div>
                 )}
 
@@ -118,19 +148,18 @@ const Product = () => {
           );
         })}
       </div>
-      <div>
-        <InfiniteScroll
-          dataLength={products.length}
-          next={infinateHandler}
-          hasMore={hasMore}
-          loader={<div className="text-center py-4">Loading more products...</div>}
-          endMessage={
-            <p className="text-center pt-5 lg:pt-10 ">
-              <b>No more product found!</b>
-            </p>
-          }
-        ></InfiniteScroll>
-      </div>
+
+      <InfiniteScroll
+        dataLength={displayProducts.length}
+        next={infinateHandler}
+        hasMore={hasMore}
+        loader={<div className="text-center py-4">Loading more products...</div>}
+        endMessage={
+          <p className="text-center pt-5 lg:pt-10">
+            <b>No more product found!</b>
+          </p>
+        }
+      />
     </div>
   );
 };
