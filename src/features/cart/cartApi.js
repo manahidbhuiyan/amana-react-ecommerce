@@ -1,4 +1,5 @@
-import { apiSlice } from '../../app/api/apiSlice';
+import { apiSlice } from "../api/apiSlice";
+
 export const cartApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Get cart contents
@@ -9,6 +10,7 @@ export const cartApiSlice = apiSlice.injectEndpoints({
       }),
       providesTags: ['Cart'],
       transformResponse: (response) => {
+        console.log("response cart",response)
         // Store in localStorage to maintain backward compatibility
         const cartData = response.data || response;
         localStorage.setItem("CartProduct", JSON.stringify(cartData));

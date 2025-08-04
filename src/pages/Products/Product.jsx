@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import notFoundImage from "../../assets/images/products/no-image.jpg";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import redRibbon from "../../assets/images/red-ribbon.png";
 import { useLocation, useNavigate } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useGetProductsQuery } from "../../features/products/productApi";
+import { productApi, useGetProductsQuery } from "../../features/products/productApi";
 import { getImageUrl } from "../../utilis/api";
+import { useAddToCartMutation, useGetCartQuery, useRemoveFromCartMutation, useUpdateCartQuantityMutation } from "../../features//cart/cartApi";
+import { addToLocalCart, updateLocalCartQuantity, removeFromLocalCart } from "../../features/cart/cartSlice";
 
 const Product = () => {
   const { search } = useLocation();
@@ -15,46 +17,60 @@ const Product = () => {
   const [hasMore, setHasMore] = useState(true);
   const [allProducts, setAllProducts] = useState([]);
 
+  const [addToCart, { isLoading: isAddingToCart }] = useAddToCartMutation();
+  const [updateCartQuantity, { isLoading: isUpdatingQuantity }] = useUpdateCartQuantityMutation();
+  const [removeFromCart] = useRemoveFromCartMutation();
+
   const queryParams = Object.fromEntries(new URLSearchParams(search));
-  
+  const { CartInformation } = useSelector((state) => state.cart);
+
   // Move the hook call to the top level
   const {
     data: productsData,
     isLoading,
     error,
-    refetch
+    refetch,
   } = useGetProductsQuery({
     pageNo: page.current,
     branchID: localStorage.getItem("branchId") || "",
     queryString: queryParams,
   });
 
+  const cartItemsMap = useMemo(() => {
+    const map = new Map();
+    CartInformation.forEach((item) => {
+      const productId = localStorage.userToken ? item.product?._id : item._id;
+      if (productId) {
+        map.set(productId, item);
+      }
+    });
+    return map;
+  }, [CartInformation]);
+
+  // Helper function to check if product is in cart
+  const checkProductToCart = (product) => {
+    return cartItemsMap.get(product._id) || null;
+  };
+
   // Handle the API response
   useEffect(() => {
     if (productsData && productsData.data) {
-      console.log("productsData after",productsData.data)
+      const newProducts =
+        productsData.data?.filter((product) => {
+          const hasStock = product.quantity >= 1;
+          // const hasImage = product.images && Array.isArray(product.images) && product.images.length > 0 && product.images[0]
+          // const isAvailable = product.online_active == true
+          return hasStock;
+        }) || [];
 
-      const newProducts = productsData.data?.filter((product) => {
-        const hasStock = product.quantity >= 1
-
-        const hasImage = product.images && Array.isArray(product.images) && product.images.length > 0 && product.images[0]
-
-        // const isAvailable = product.online_active == true
-
-        return hasStock && hasImage 
-      }) || [];
-
-      console.log("newProducts after",newProducts)
-     
-      
       if (page.current === 1) {
         // First page - replace all products
         setAllProducts(newProducts);
       } else {
         // Subsequent pages - append new products
-        setAllProducts(prev => [...prev, ...newProducts]);
+        setAllProducts((prev) => [...prev, ...newProducts]);
       }
-      
+
       // Check if there are more products to load
       if (newProducts.length === 0) {
         setHasMore(false);
@@ -70,6 +86,13 @@ const Product = () => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   }, [search]);
 
+  // ✅ Error handling
+  useEffect(() => {
+    if (error) {
+      toast.error("Failed to load new products");
+    }
+  }, [error]);
+
   // Infinite scroll handler
   const infinateHandler = useCallback(() => {
     if (!isLoading && hasMore) {
@@ -78,14 +101,97 @@ const Product = () => {
     }
   }, [isLoading, hasMore, refetch]);
 
+  const add_to_cart = (product) => {
+    let code = product._id;
+    let branchId = localStorage.getItem("branchId");
+
+    if (localStorage.getItem("userToken")) {
+      addToCart({ code, branchId });
+    } else {
+      dispatch(addToLocalCart(product));
+    }
+  };
+
+  const cartQuantityPlus = (product) => {
+    const cartItem = checkProductToCart(product);
+
+    if (cartItem && cartItem.quantity < cartItem.maxQuantity) {
+      const newQuantity = cartItem.quantity + 1;
+
+      if (localStorage.getItem("userToken")) {
+        updateCartQuantity({
+          productId: cartItem._id,
+          quantity: newQuantity,
+          branchId: localStorage.getItem("branchId"),
+        });
+      } else {
+        dispatch(
+          updateLocalCartQuantity({
+            productId: cartItem._id,
+            quantity: newQuantity,
+          })
+        );
+      }
+    } else {
+      toast.warning(
+        <div>
+          We are very sorry! We currently do not have the quantity of <strong>'{cartItem?.name || product.name}'</strong> in stock that you require.
+        </div>,
+        {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        }
+      );
+    }
+  };
+
+  const cartQuantityMinus = (product) => {
+    const cartItem = checkProductToCart(product);
+    if (cartItem && cartItem.quantity > 1) {
+      const newQuantity = cartItem.quantity - 1;
+
+      if (localStorage.getItem("userToken")) {
+        updateCartQuantity({
+          productId: cartItem._id,
+          quantity: newQuantity,
+          branchId: localStorage.getItem("branchId"),
+        });
+      } else {
+        dispatch(
+          updateLocalCartQuantity({
+            productId: cartItem._id,
+            quantity: newQuantity,
+          })
+        );
+      }
+    } else if (cartItem && cartItem.quantity === 1) {
+      removeProduct(cartItem);
+    }
+  };
+
+  const removeProduct = (item) => {
+    const productId = item._id;
+    if (localStorage.getItem("userToken")) {
+      removeFromCart({
+        productId,
+        branchId: localStorage.getItem("branchId"),
+      });
+    } else {
+      dispatch(removeFromLocalCart(productId));
+    }
+  };
+
   const moveToProductDetails = (product) => {
     navigate(`/product/${product.category.name}/${product.subcategory.name}/${product.slug}/${product.barcode}`);
   };
 
   // Use allProducts for rendering instead of products from Redux
   const displayProducts = allProducts.length > 0 ? allProducts : [];
-
-  console.log("displayProducts",displayProducts)
 
   return (
     <div className="mx-auto px-4 py-4">
@@ -108,9 +214,7 @@ const Product = () => {
 
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">
-                    {product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}
-                  </span>
+                  <span className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">{product.unitType && product.unitType.shortform === "pc" ? "Piece" : "KG"}</span>
                 </div>
 
                 <h3
@@ -125,24 +229,44 @@ const Product = () => {
 
                 {product.discount > 0 ? (
                   <div className="flex justify-start gap-3 items-center pt-2">
-                    <div className="price text-themeColor text-lg font-bold leading-normal">
-                      Tk. {(product.price.sell - product.discount).toFixed(2)}
-                    </div>
-                    <del className="text-gray-400 text-sm leading-normal">
-                      Tk. {product.price.sell.toFixed(2)}
-                    </del>
+                    <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {(product.price.sell - product.discount).toFixed(2)}</div>
+                    <del className="text-gray-400 text-sm leading-normal">Tk. {product.price.sell.toFixed(2)}</del>
                   </div>
                 ) : (
                   <div className="flex justify-start gap-2 items-center pt-2">
-                    <div className="price text-themeColor text-lg font-bold leading-normal">
-                      Tk. {product.price.sell.toFixed(2)}
-                    </div>
+                    <div className="price text-themeColor text-lg font-bold leading-normal">Tk. {product.price.sell.toFixed(2)}</div>
                   </div>
                 )}
 
-                <button className="w-full bg-themeColor text-white text-sm font-medium py-2 mt-4 rounded hover:bg-[#41b899]">
-                  <i className="fas fa-shopping-basket"></i> Add To Cart
-                </button>
+                {/* Stock check */}
+                {product.quantity > 0 ? (
+                  <div className="actions mt-4">
+                    {!cartItemsMap.get(product._id) ? (
+                      <button
+                        onClick={() => add_to_cart(product)}
+                        disabled={isAddingToCart}
+                        className="w-full bg-themeColor text-white text-sm font-medium py-2 rounded hover:bg-[#41b899] disabled:opacity-50"
+                      >
+                        <i className="fas fa-shopping-basket"></i>
+                        {isAddingToCart ? " Adding..." : " Add To Cart"}
+                      </button>
+                    ) : (
+                      <div className="flex items-center border border-gray-300 rounded-lg">
+                        <button onClick={() => cartQuantityMinus(product)} disabled={isUpdatingQuantity} className="w-1/5 p-3 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50">
+                          <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="w-3/5 px-4 py-2 border-x border-gray-300 font-medium text-center cursor-pointer">{cartItemsMap.get(product._id)?.quantity || 0}</span>
+                        <button onClick={() => cartQuantityPlus(product)} disabled={isUpdatingQuantity} className="w-1/5 p-3 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50">
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="mt-4 text-center">
+                    <span className="text-red-500 font-bold">Out of Stock</span>
+                  </div>
+                )}
               </div>
             </div>
           );
