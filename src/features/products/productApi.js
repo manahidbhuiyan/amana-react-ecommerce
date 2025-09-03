@@ -17,7 +17,6 @@ export const productApi = apiSlice.injectEndpoints({
                 }
 
                 let api = `/api/product/lists/${pageNo}?branch=${branchID}${searchQuery}`
-                console.log("api",api)
 
                 return api
             },
@@ -25,7 +24,6 @@ export const productApi = apiSlice.injectEndpoints({
                 { type: 'Product', id: `LIST-${branchID}-${pageNo}` },
             ],
             transformResponse: (response) => {
-                console.log("RTK response:", response);
                 return response;
             },
         })

@@ -63,20 +63,8 @@ const SpecialOffers = () => {
     return cartItemsMap.get(product._id) || null;
   };
 
-  // useEffect(() => {
-  //   let queryString = {
-  //     specialOffer: true,
-  //   };
-  //   let branchId = localStorage.branchId;
-
-  //   dispatch(loadProductData({ pageNo: 1, branchId, queryString, queryType: "specialOffer" }));
-  // }, [dispatch]);
-
-  // ✅ API response handle
   useEffect(() => {
     if (productsData) {
-
-      // Server response যেকোনো format এ আসুক, handle করুন
       let products = [];
 
       if (productsData.data && Array.isArray(productsData.data)) {

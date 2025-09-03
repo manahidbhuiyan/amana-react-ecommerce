@@ -1,5 +1,4 @@
 // src/pages/Home/Home.jsx
-import React, { useEffect } from "react";
 import Hero from "../../components/Home/Hero";
 import NewProducts from "../../components/Home/NewProducts";
 import SpecialOffers from "../../components/Home/SpecialOffers";
